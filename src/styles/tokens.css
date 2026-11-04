@@ -14,8 +14,6 @@
   font-weight: 300 700;
   font-display: swap;
   src: url("../assets/fonts/space-grotesk-latin-wght-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -24,8 +22,6 @@
   font-weight: 100 800;
   font-display: swap;
   src: url("../assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -34,8 +30,6 @@
   font-weight: 100 800;
   font-display: swap;
   src: url("../assets/fonts/sora-latin-wght-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 :root {
@@ -66,27 +60,27 @@
   --rt-accent-text: light-dark(#076a80, #5fe3f3);
   --rt-accent-soft: light-dark(#e3f3f7, #0e2a30);   /* behind what is current or picked */
   --rt-accent-strong: light-dark(#065d71, #7eeaf8); /* text on --rt-accent-soft */
-  --rt-glow: light-dark(rgb(11 124 149 / 0.12), rgb(61 220 240 / 0.13)); /* the light behind the top and the panels */
+  --rt-glow: color-mix(in srgb, var(--rt-accent) 12%, transparent); /* the light behind the top and the panels */
 
   /* What a run found. An error is the API failing at its job; a warning, the API and its document disagreeing. */
   --rt-error: light-dark(#c0243f, #ff6f86);
   --rt-warning: light-dark(#8a5800, #f4c14d);
   --rt-ok: light-dark(#17784a, #4fd88f);            /* nothing found */
 
-  /* Replies by class of status code. 3xx takes --rt-text-3. */
+  /* Replies by class of status code. */
   --rt-2xx: light-dark(#2f6fd6, #5ea8ff);
+  --rt-3xx: var(--rt-text-3);
   --rt-4xx: light-dark(#7051c9, #b29cff);
-  --rt-5xx: light-dark(#c0243f, #ff6f86);
+  --rt-5xx: var(--rt-error);
 
   /* Type: Space Grotesk for text, JetBrains Mono for code and small labels, Sora for every number. */
   --rt-font-sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   --rt-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --rt-font-num: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rt-font-num: "Sora", var(--rt-font-sans);
   --rt-text-min: 14px;                              /* no text is set smaller */
 
   /* Corners. */
-  --rt-radius: 10px;                                /* fields, code, tabs */
-  --rt-radius-button: 9px;
+  --rt-radius: 10px;                                /* buttons, fields, code, tabs */
   --rt-radius-card: 14px;
 }
 
