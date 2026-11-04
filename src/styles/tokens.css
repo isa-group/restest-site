@@ -1,0 +1,99 @@
+/*
+ * The look of RESTest's site: its colours, its type, the smallest size text may take and the radius of its corners.
+ * The landing page, the documentation and the showcase take their colours, type and corners from these, so that
+ * the three read as one site; sizes and spacing are each part's own. The look was settled on a mock-up on
+ * 4 November 2026.
+ *
+ * Every colour is written once, light first and dark second, with light-dark(). Without data-theme on the root the
+ * page follows the system; with data-theme="light" or "dark" that theme wins. Starlight always sets it, resolving
+ * its "auto" to the system's theme, and these tokens follow it either way. Each colour meant for text was measured
+ * against the surfaces it sits on and reaches WCAG AA, 4.5 : 1, in both themes; the colours of replies by status
+ * code are for marks, below. light-dark() needs a browser from 2024 on; an older one shows the pages without these
+ * colours, still readable, which was accepted to keep each colour in one place.
+ */
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../assets/fonts/space-grotesk-latin-wght-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("../assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Sora";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("../assets/fonts/sora-latin-wght-normal.woff2") format("woff2");
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces, from the page itself to what sits on it. */
+  --rt-bg: light-dark(#f6f7f9, #07080a);            /* the page */
+  --rt-bg-alt: light-dark(#ffffff, #0c0e11);        /* every other band of the landing page */
+  --rt-bg-tint: light-dark(#e9f5f8, #0a1a1d);       /* a band tinted with the accent, the landing page's last */
+  --rt-surface: light-dark(#ffffff, #0e1013);       /* cards, panels, tables */
+  --rt-surface-2: light-dark(#eef0f3, #14171b);     /* a surface inside a surface, and inline code */
+  --rt-code-bg: light-dark(#f3f5f7, #0b0d10);       /* blocks of code and commands */
+
+  /* Lines between things, from the faintest to the one that frames a card. */
+  --rt-line-faint: light-dark(#eceef1, #15181c);
+  --rt-line: light-dark(#e1e4e9, #1d2127);
+  --rt-line-strong: light-dark(#c9ced6, #2c323a);
+
+  /* Text, from what is read first to what is read last. */
+  --rt-text: light-dark(#0b0d10, #f1f3f6);
+  --rt-text-2: light-dark(#454d59, #a4acb8);
+  --rt-text-3: light-dark(#5b6471, #8b94a1);
+
+  /* The one accent: electric cyan. --rt-accent fills buttons and marks, with --rt-on-accent as their label;
+     --rt-accent-text is the accent as text: links, labels, and the second part of every title. */
+  --rt-accent: light-dark(#087189, #3ddcf0);
+  --rt-on-accent: light-dark(#ffffff, #031317);
+  --rt-accent-text: light-dark(#076a80, #5fe3f3);
+  --rt-accent-soft: light-dark(#e3f3f7, #0e2a30);   /* behind what is current or picked */
+  --rt-accent-strong: light-dark(#065d71, #7eeaf8); /* text on --rt-accent-soft */
+  --rt-glow: color-mix(in srgb, var(--rt-accent) 12%, transparent); /* the light behind the top and the panels */
+
+  /* What a run found. An error is the API failing at its job; a warning, the API answering something its document
+     does not describe. These three are text as well as marks. */
+  --rt-error: light-dark(#c0243f, #ff6f86);
+  --rt-warning: light-dark(#8a5800, #f4c14d);
+  --rt-ok: light-dark(#17784a, #4fd88f);            /* nothing found */
+
+  /* Replies by class of status code. Marks only, such as dots and bars, which need 3 : 1 against what they sit on;
+     never text, which light 2xx would not carry on most surfaces. */
+  --rt-2xx: light-dark(#2f6fd6, #5ea8ff);
+  --rt-3xx: var(--rt-text-3);
+  --rt-4xx: light-dark(#7051c9, #b29cff);
+  --rt-5xx: var(--rt-error);
+
+  /* Type: Space Grotesk for text, JetBrains Mono for code and small labels, Sora for every number. */
+  --rt-font-sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rt-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --rt-font-num: "Sora", var(--rt-font-sans);
+  --rt-text-min: 14px;                              /* no text is set smaller */
+
+  /* Corners. */
+  --rt-radius: 10px;                                /* buttons, fields, blocks of code, small panels */
+  --rt-radius-card: 14px;                           /* cards and the larger panels */
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
