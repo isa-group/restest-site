@@ -12,13 +12,16 @@ None of them is built yet. What the repository holds today is the look the three
 ## The look
 
 - [`src/styles/tokens.css`](src/styles/tokens.css) — the colours, light and dark, the three
-  typefaces, the smallest size text may take and the radius of corners, each with a line saying what
-  it is for. Every part of the site takes its look from this file.
+  typefaces, the smallest size text may take and the radius of corners, with comments saying what
+  each is for. Every part of the site takes its colours, type and corners from this file.
 - [`src/assets/logo.svg`](src/assets/logo.svg) and [`src/assets/logo-dark.svg`](src/assets/logo-dark.svg)
   — RESTest's logo, for light and dark backgrounds, with the check in the accent colour. Being images, they
   cannot read `tokens.css`: they repeat its `--rt-text` and `--rt-accent` by value, and change with them.
 - [`src/assets/fonts/`](src/assets/fonts) — Space Grotesk, JetBrains Mono and Sora, served by the site
-  itself rather than by a font service, each beside its licence, the SIL Open Font License 1.1.
+  itself rather than by a font service, each beside its licence, the SIL Open Font License 1.1. They
+  are the variable, Latin files of Fontsource 5.3.0 (`@fontsource-variable/space-grotesk`,
+  `jetbrains-mono` and `sora`); characters outside Latin, such as arrows, are drawn by the system's
+  fonts.
 
 ## License
 
