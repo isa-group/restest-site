@@ -8,7 +8,8 @@
  * page follows the system; with data-theme="light" or "dark" that theme wins. Starlight always sets it, resolving
  * its "auto" to the system's theme, and these tokens follow it either way. Each colour meant for text was measured
  * against the surfaces it sits on and reaches WCAG AA, 4.5 : 1, in both themes; the colours of replies by status
- * code are for marks, below.
+ * code are for marks, below. light-dark() needs a browser from 2024 on; an older one shows the pages without these
+ * colours, still readable, which was accepted to keep each colour in one place.
  */
 
 @font-face {
