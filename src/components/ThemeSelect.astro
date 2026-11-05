@@ -1,0 +1,139 @@
+---
+/*
+ * The colour theme, picked in one click: three buttons side by side, following the system, light and dark,
+ * as the site's mock-up draws them, in place of Starlight's drop-down. Starlight shows it in the header and,
+ * on a phone, at the foot of the menu.
+ *
+ * The choice is kept where Starlight keeps it, under `starlight-theme` in the browser's storage, so that
+ * Starlight's own script, which runs before the page is drawn, sets the theme without a flash.
+ */
+const choices = [
+  {
+    value: 'auto',
+    label: 'Follow the system',
+    icon: '<rect x="1.5" y="2.5" width="13" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 14h5M8 11.5V14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+  },
+  {
+    value: 'light',
+    label: 'Light',
+    icon: '<circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+  },
+  {
+    value: 'dark',
+    label: 'Dark',
+    icon: '<path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+  },
+];
+---
+
+<rt-theme-select>
+  <div class="theme" role="group" aria-label="Colour theme">
+    {
+      choices.map(({ value, label, icon }) => (
+        <button type="button" data-choice={value} aria-label={label} title={label} aria-pressed="false">
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" set:html={icon} />
+        </button>
+      ))
+    }
+  </div>
+</rt-theme-select>
+
+{/* Marks the stored choice before the page is drawn, as Starlight does with its drop-down. */}
+<script is:inline>
+  (() => {
+    let choice = '';
+    try {
+      choice = localStorage.getItem('starlight-theme') || '';
+    } catch {}
+    choice = choice === 'light' || choice === 'dark' ? choice : 'auto';
+    document.querySelectorAll('rt-theme-select button').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.choice === choice));
+    });
+  })();
+</script>
+
+<script>
+  type Theme = 'auto' | 'light' | 'dark';
+
+  const storageKey = 'starlight-theme';
+  const systemLight = matchMedia('(prefers-color-scheme: light)');
+
+  const parse = (value: unknown): Theme => (value === 'light' || value === 'dark' ? value : 'auto');
+
+  function stored(): Theme {
+    try {
+      return parse(localStorage.getItem(storageKey));
+    } catch {
+      return 'auto';
+    }
+  }
+
+  /** Draws the page in the theme, and marks its button in every picker on the page. */
+  function show(theme: Theme): void {
+    document.documentElement.dataset.theme = theme === 'auto' ? (systemLight.matches ? 'light' : 'dark') : theme;
+    document.querySelectorAll<HTMLButtonElement>('rt-theme-select button').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.choice === theme));
+    });
+  }
+
+  function choose(theme: Theme): void {
+    try {
+      localStorage.setItem(storageKey, theme === 'auto' ? '' : theme);
+    } catch {}
+    show(theme);
+  }
+
+  systemLight.addEventListener('change', () => {
+    if (stored() === 'auto') show('auto');
+  });
+
+  class ThemeSelect extends HTMLElement {
+    constructor() {
+      super();
+      this.addEventListener('click', (event) => {
+        const button = (event.target as Element).closest<HTMLButtonElement>('button[data-choice]');
+        if (button) choose(parse(button.dataset.choice));
+      });
+    }
+  }
+  customElements.define('rt-theme-select', ThemeSelect);
+  show(stored());
+</script>
+
+<style>
+  .theme {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--rt-line);
+    border-radius: 999px;
+    background: var(--rt-surface);
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--rt-text-3);
+    cursor: pointer;
+  }
+
+  button:hover {
+    color: var(--rt-text);
+  }
+
+  button[aria-pressed='true'] {
+    background: var(--rt-surface-2);
+    color: var(--rt-text);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--rt-accent);
+    outline-offset: 1px;
+  }
+</style>

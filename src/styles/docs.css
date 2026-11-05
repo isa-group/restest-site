@@ -1,0 +1,224 @@
+/*
+ * The documentation in the site's look. Starlight draws every page from its own --sl-* properties; here
+ * they take the site's colours and type from tokens.css, which follow the theme the reader picks. These
+ * rules are in no cascade layer, so they win over Starlight's, which are all in layers.
+ */
+
+:root {
+  /* Type. No text is set under --rt-text-min: Starlight's 12 and 13 px sizes are raised to it. */
+  --sl-font: var(--rt-font-sans);
+  --sl-font-mono: var(--rt-font-mono);
+  --sl-text-2xs: var(--rt-text-min);
+  --sl-text-xs: var(--rt-text-min);
+
+  /* Starlight's grey scale runs from the strongest text, "white" in its dark theme, to the page, "black";
+     its light theme turns the scale round. Each step takes the token used for the same job. */
+  --sl-color-white: var(--rt-text);
+  --sl-color-gray-1: var(--rt-text);
+  --sl-color-gray-2: var(--rt-text-2);
+  --sl-color-gray-3: var(--rt-text-3);
+  --sl-color-gray-4: var(--rt-line-strong);
+  --sl-color-gray-5: var(--rt-line);
+  --sl-color-gray-6: var(--rt-surface-2);
+  --sl-color-gray-7: var(--rt-surface);
+  --sl-color-black: var(--rt-bg);
+
+  --sl-color-accent-low: var(--rt-accent-soft);
+  --sl-color-accent: var(--rt-accent);
+  --sl-color-accent-high: var(--rt-accent-strong);
+
+  --sl-color-text: var(--rt-text);
+  --sl-color-text-accent: var(--rt-accent-text);
+  --sl-color-text-invert: var(--rt-on-accent);
+  --sl-color-bg: var(--rt-bg);
+  --sl-color-bg-nav: var(--rt-bg);
+  --sl-color-bg-sidebar: var(--rt-bg);
+  --sl-color-bg-inline-code: var(--rt-surface-2);
+  --sl-color-bg-accent: var(--rt-accent);
+  --sl-color-hairline-light: var(--rt-line);
+  --sl-color-hairline: var(--rt-line);
+  --sl-color-hairline-shade: var(--rt-line);
+}
+
+/* Headings: a section at 26 px, as the mock-up has it, and the levels below it smaller still. */
+:root {
+  --sl-text-h2: 1.625rem; /* 26px */
+  --sl-text-h3: var(--sl-text-xl); /* 20px */
+  --sl-text-h4: var(--sl-text-lg); /* 18px */
+}
+
+@media (min-width: 50em) {
+  :root {
+    --sl-text-h1: 2.5rem; /* 40px */
+  }
+}
+
+/* Wide screens: the menu, the text and "On this page" side by side, as one block in the middle of the
+   window, and the header's logo, search and buttons lined up with it. Starlight keeps the menu at the
+   window's edge and centres the text alone, which on a large screen leaves a wide gap after the menu.
+   Each rule below takes the space either side of the block, `(100% - var(--rt-page-width)) / 2`, from an
+   element as wide as the window: the header, the menu and the frame of the page all are. */
+@media (min-width: 72rem) {
+  :root[data-has-sidebar][data-has-toc] {
+    --rt-page-width: calc(
+      2 * var(--sl-sidebar-width) + var(--sl-content-width) + 2 * var(--sl-content-pad-x)
+    );
+  }
+
+  [data-has-sidebar][data-has-toc] .sidebar-pane {
+    inset-inline-start: max(0px, (100% - var(--rt-page-width)) / 2);
+  }
+
+  [data-has-sidebar][data-has-toc] .main-frame {
+    padding-inline: calc(max(0px, (100% - var(--rt-page-width)) / 2) + var(--sl-sidebar-width))
+      max(0px, (100% - var(--rt-page-width)) / 2);
+  }
+
+  [data-has-sidebar][data-has-toc] .main-pane {
+    width: min(
+      calc(100% - var(--sl-sidebar-width)),
+      calc(var(--sl-content-width) + 2 * var(--sl-content-pad-x))
+    );
+  }
+
+  [data-has-sidebar][data-has-toc] .right-sidebar-container {
+    margin-inline-start: 0;
+    width: var(--sl-sidebar-width);
+  }
+
+  [data-has-sidebar][data-has-toc] header.header {
+    padding-inline: calc(max(0px, (100% - var(--rt-page-width)) / 2) + var(--sl-nav-pad-x));
+  }
+
+  /* The logo above the menu, the search where the text starts, the buttons at the block's right edge. */
+  [data-has-sidebar][data-has-toc] header.header > .header {
+    grid-template-columns: minmax(calc(var(--sl-sidebar-width) - var(--sl-nav-pad-x)), auto) 1fr auto;
+  }
+}
+
+/* Phones: the theme buttons stay in the header, beside search, as in the mock-up, rather than at the foot
+   of a long menu, where GitHub's icon stays. The menu button is a plain icon, not a filled circle. */
+@media (width < 50rem) {
+  header.header .right-group {
+    display: flex;
+  }
+
+  header.header .right-group .social-icons,
+  .mobile-preferences rt-theme-select {
+    display: none;
+  }
+
+  header.header > .header > .title-wrapper {
+    margin-inline-end: auto;
+  }
+}
+
+.sl-menu-button {
+  background-color: transparent;
+  color: var(--rt-text-2);
+  box-shadow: none;
+}
+
+.sl-menu-button:hover {
+  color: var(--rt-text);
+}
+
+/* The page: titles drawn tighter and links underlined lightly. Every paragraph has one size, the first too. */
+h1#_top,
+.sl-markdown-content :is(h1, h2, h3) {
+  letter-spacing: -0.025em;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.sl-markdown-content code:not(:where(.not-content *)) {
+  border-radius: 5px;
+}
+
+/* The sidebar: groups headed in bold capitals of the code face, in the colour of the text, and kept apart
+   by a line; the current page tinted with the accent, with a bar of it at its side, rather than filled. */
+.sidebar-content .group-label .large {
+  font-family: var(--rt-font-mono);
+  font-size: var(--rt-text-min);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rt-text);
+}
+
+.sidebar-content .top-level > li + li {
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--rt-line-strong);
+}
+
+.sidebar-content ul ul li {
+  margin-inline-start: 0;
+  border-inline-start: 0;
+  padding-inline-start: 0;
+}
+
+.sidebar-content a {
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+@media (min-width: 50rem) {
+  .sidebar-content a {
+    font-size: 0.9375rem; /* 15px */
+  }
+}
+
+.sidebar-content [aria-current='page'] {
+  border-radius: 0 8px 8px 0;
+  box-shadow: inset 2px 0 0 var(--rt-accent);
+  background-color: var(--rt-accent-soft);
+  color: var(--rt-accent-strong);
+}
+
+/* A chapter of the manual shows its number, as the manual's own list does. */
+.sidebar-content a[data-chapter] {
+  display: flex;
+  gap: 10px;
+}
+
+.sidebar-content a[data-chapter]::before {
+  content: attr(data-chapter);
+  flex: none;
+  min-width: 2ch;
+  white-space: nowrap;
+  text-align: end;
+  color: var(--rt-text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.sidebar-content a[data-chapter][aria-current='page']::before {
+  color: inherit;
+}
+
+/* "On this page": a line down the side, the accent beside the heading being read. */
+starlight-toc a {
+  border-radius: 0;
+  border-inline-start: 2px solid var(--rt-line);
+  color: var(--rt-text-2);
+}
+
+starlight-toc a[aria-current='true'] {
+  border-inline-start-color: var(--rt-accent);
+  color: var(--rt-accent-strong);
+  font-weight: 500;
+}
+
+/* Search draws its results at 0.8 of its own sizes, down to 11 px; at full size none is under 14 px. */
+#starlight__search .pagefind-ui {
+  --pagefind-ui-scale: 1;
+}
+
+/* Badges, images inside a link in running text, stay in the line, as GitHub shows them. */
+.sl-markdown-content p > a > img {
+  display: inline-block;
+  vertical-align: middle;
+}
