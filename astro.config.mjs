@@ -1,0 +1,65 @@
+// @ts-check
+import { existsSync, readFileSync } from 'node:fs';
+import { satteri } from '@astrojs/markdown-satteri';
+import starlight from '@astrojs/starlight';
+import { defineConfig } from 'astro/config';
+import starlightLinksValidator from 'starlight-links-validator';
+import { base, repository, site } from './site.config.mjs';
+
+// The sidebar is read from RESTest's two indexes by scripts/sync-docs.mjs, which `npm run build` and
+// `npm run dev` run first.
+const sidebarFile = new URL('./src/generated/sidebar.json', import.meta.url);
+if (!existsSync(sidebarFile)) {
+  throw new Error('src/generated/sidebar.json is missing: run `npm run sync` first, or `npm run build`');
+}
+const sidebar = JSON.parse(readFileSync(sidebarFile, 'utf8'));
+
+export default defineConfig({
+  site,
+  base,
+  trailingSlash: 'always',
+  // The landing page is not built yet; until it exists, the site opens on the documentation.
+  redirects: { '/': `${base}/docs/` },
+  // RESTest's pages are shown as written. Astro's smart punctuation would turn the option `--auth` into
+  // `–auth`, and straight quotes into curly ones, which GitHub never does.
+  markdown: { processor: satteri({ features: { smartPunctuation: false } }) },
+  integrations: [
+    starlight({
+      title: 'RESTest',
+      description: 'The documentation of RESTest, a black-box testing tool for REST APIs.',
+      logo: { light: './src/assets/logo.svg', dark: './src/assets/logo-dark.svg', replacesTitle: true },
+      favicon: '/favicon.svg',
+      social: [{ icon: 'github', label: 'RESTest on GitHub', href: repository }],
+      customCss: ['./src/styles/tokens.css', './src/styles/docs.css'],
+      // The theme in one click, with three buttons, rather than in Starlight's drop-down.
+      components: { ThemeSelect: './src/components/ThemeSelect.astro' },
+      sidebar,
+      pagination: false,
+      expressiveCode: {
+        styleOverrides: {
+          codeFontFamily: 'var(--rt-font-mono)',
+          codeFontSize: 'var(--rt-text-min)',
+          uiFontFamily: 'var(--rt-font-sans)',
+          uiFontSize: 'var(--rt-text-min)',
+          borderRadius: 'var(--rt-radius)',
+          borderColor: 'var(--rt-line)',
+        },
+        // Starlight gives code blocks the colours of its own surfaces after these overrides are read, so
+        // the background of code, and of the bar above it, is set on the theme itself, after Starlight.
+        customizeTheme(theme) {
+          const code = 'var(--rt-code-bg)';
+          theme.styleOverrides.frames = {
+            ...theme.styleOverrides.frames,
+            editorBackground: code,
+            terminalBackground: code,
+            editorActiveTabBackground: code,
+            editorTabBarBackground: code,
+            terminalTitlebarBackground: code,
+          };
+          return theme;
+        },
+      },
+      plugins: [starlightLinksValidator()],
+    }),
+  ],
+});

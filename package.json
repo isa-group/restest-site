@@ -1,0 +1,24 @@
+{
+  "name": "restest-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/sync-docs.mjs",
+    "dev": "node scripts/sync-docs.mjs && astro dev",
+    "build": "node scripts/sync-docs.mjs && astro build",
+    "preview": "astro preview",
+    "test": "node --test 'test/*.test.mjs'"
+  },
+  "dependencies": {
+    "@astrojs/markdown-satteri": "0.4.6",
+    "@astrojs/starlight": "0.42.9",
+    "astro": "7.4.5",
+    "github-slugger": "2.0.0",
+    "mdast-util-from-markdown": "2.1.0",
+    "mdast-util-gfm": "3.1.0",
+    "mdast-util-to-string": "4.0.0",
+    "micromark-extension-gfm": "3.0.0",
+    "starlight-links-validator": "0.27.0",
+    "unist-util-visit": "5.2.0"
+  }
+}
