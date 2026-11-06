@@ -10,6 +10,8 @@ export function llmsTxt(outline, { describes, raw, overviewTitle }) {
   const lines = [
     '# RESTest',
     '',
+    // RESTest's workflow documentation-site.yml, once it has written a release into restest-version, waits
+    // for this sentence to name it, "The documentation of RESTest 2.5.0,": change the two together.
     `> The documentation of ${describes}, a black-box testing tool for REST APIs: a manual to read from the beginning, and one page per subject to look things up in. Each link is a page's Markdown in that version.`,
     '',
     link(overviewTitle, outline.overview.path, 'every page, and what it covers'),

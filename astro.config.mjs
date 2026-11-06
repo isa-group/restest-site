@@ -5,6 +5,7 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
 import { base, repository, site } from './site.config.mjs';
+import { mermaidDiagrams } from './src/markdown/mermaid.mjs';
 
 // The sidebar is read from RESTest's two indexes by scripts/sync-docs.mjs, which `npm run build` and
 // `npm run dev` run first.
@@ -21,8 +22,9 @@ export default defineConfig({
   // The landing page is not built yet; until it exists, the site opens on the documentation.
   redirects: { '/': `${base}/docs/` },
   // RESTest's pages are shown as written. Astro's smart punctuation would turn the option `--auth` into
-  // `–auth`, and straight quotes into curly ones, which GitHub never does.
-  markdown: { processor: satteri({ features: { smartPunctuation: false } }) },
+  // `–auth`, and straight quotes into curly ones, which GitHub never does. A Mermaid diagram is drawn, as
+  // GitHub draws it, rather than shown as code.
+  markdown: { processor: satteri({ features: { smartPunctuation: false }, mdastPlugins: [mermaidDiagrams] }) },
   integrations: [
     starlight({
       title: 'RESTest',
@@ -31,8 +33,12 @@ export default defineConfig({
       favicon: '/favicon.svg',
       social: [{ icon: 'github', label: 'RESTest on GitHub', href: repository }],
       customCss: ['./src/styles/tokens.css', './src/styles/docs.css'],
-      // The theme in one click, with three buttons, rather than in Starlight's drop-down.
-      components: { ThemeSelect: './src/components/ThemeSelect.astro' },
+      components: {
+        // The theme in one click, with three buttons, rather than in Starlight's drop-down.
+        ThemeSelect: './src/components/ThemeSelect.astro',
+        // A page's text, with its Mermaid diagrams drawn.
+        MarkdownContent: './src/components/MarkdownContent.astro',
+      },
       sidebar,
       pagination: false,
       expressiveCode: {

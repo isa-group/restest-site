@@ -217,6 +217,65 @@ starlight-toc a[aria-current='true'] {
   --pagefind-ui-scale: 1;
 }
 
+/* A Mermaid diagram, once drawn: the picture alone, centred, with neither the frame nor the type of code, which
+   its text has until then, and for good without JavaScript. */
+.sl-markdown-content pre.mermaid[data-processed] {
+  border: 0;
+  padding: 0;
+  font-family: var(--sl-font);
+  white-space: normal;
+  text-align: center;
+  cursor: zoom-in;
+}
+
+/* Under it, on the right, the button that shows it at its own size. */
+.sl-markdown-content .rt-diagram-open {
+  display: block;
+  width: fit-content;
+  margin: 0.5rem 0 0 auto;
+  padding: 4px 12px;
+  border: 1px solid var(--rt-line);
+  border-radius: 999px;
+  background: var(--rt-surface);
+  color: var(--rt-text-2);
+  font-family: var(--rt-font-mono);
+  font-size: var(--rt-text-min);
+  cursor: pointer;
+}
+
+.sl-markdown-content .rt-diagram-open:hover {
+  border-color: var(--rt-line-strong);
+  color: var(--rt-text);
+}
+
+.sl-markdown-content .rt-diagram-open:focus-visible {
+  outline: 2px solid var(--rt-accent);
+  outline-offset: 2px;
+}
+
+/* The same diagram at its own size, over the whole window; a click anywhere, or Escape, closes it. */
+dialog.rt-diagram {
+  box-sizing: border-box;
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 1.5rem;
+  border: 0;
+  overflow: auto;
+  background: var(--rt-bg);
+  font-family: var(--sl-font);
+  cursor: zoom-out;
+}
+
+dialog.rt-diagram svg {
+  display: block;
+  max-width: none;
+  height: auto;
+  margin: auto;
+}
+
 /* Badges, images inside a link in running text, stay in the line, as GitHub shows them. */
 .sl-markdown-content p > a > img {
   display: inline-block;
