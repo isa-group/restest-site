@@ -62,9 +62,27 @@ code {
   white-space: nowrap;
 }
 
-/* One picture for each theme: the logo, and the report's pages. */
-:root:not([data-theme='dark']) .for-dark,
+/* One picture for each theme: the logo, and the report's pages. Without JavaScript nothing sets the theme,
+   and the system's decides. */
+:root[data-theme='light'] .for-dark,
 :root[data-theme='dark'] .for-light {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .for-light {
+    display: none;
+  }
+}
+
+@media not (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .for-dark {
+    display: none;
+  }
+}
+
+/* What only works with the page's script is not drawn without it. */
+:root:not(.js) :is(.copy, .live, rt-theme-select) {
   display: none;
 }
 
@@ -517,17 +535,21 @@ code {
 .bb .req,
 .bb .rep {
   opacity: 0;
+}
+
+.js .bb .req,
+.js .bb .rep {
   animation-duration: 5s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   animation-delay: var(--delay);
 }
 
-.bb .req {
+.js .bb .req {
   animation-name: request;
 }
 
-.bb .rep {
+.js .bb .rep {
   animation-name: reply;
 }
 
@@ -618,6 +640,9 @@ code {
   border-radius: 999px;
   font-weight: 600;
   color: var(--rt-accent-text);
+}
+
+.js .bb-v .methods span {
   animation-name: sent;
   animation-duration: 5s;
   animation-timing-function: ease-in-out;
@@ -720,10 +745,6 @@ code {
   font-weight: 600;
   line-height: 1.4;
   overflow-wrap: anywhere;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 /* Paused by its button, or while it is out of view. */

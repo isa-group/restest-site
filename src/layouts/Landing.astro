@@ -17,7 +17,7 @@ interface Props {
   title: string;
   description: string;
   version: string;
-  links: { docs: string; start: string; manual: string; agents: string | null };
+  links: { docs: string; reference: string; start: string; manual: string; agents: string | null };
 }
 const { title, description, version, links } = Astro.props;
 const base = import.meta.env.BASE_URL;
@@ -93,7 +93,7 @@ const themeKey = 'restest-landing-theme';
         <div>
           <b>Documentation</b>
           <a href={links.manual}>The manual</a>
-          <a href={links.docs}>Reference</a>
+          <a href={links.reference}>Reference</a>
           {links.agents && <a href={links.agents}>For coding agents</a>}
         </div>
         <div>

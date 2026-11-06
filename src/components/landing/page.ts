@@ -31,15 +31,22 @@ function copying(root: HTMLElement): void {
   root.addEventListener('click', async (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>('[data-copy]');
     if (!button) return;
+    const label = button.querySelector('span');
+    let said: string;
     try {
       await navigator.clipboard.writeText(button.dataset.copy ?? '');
-      const label = button.querySelector('span');
-      if (label) {
-        label.textContent = 'Copied';
-        setTimeout(() => (label.textContent = 'Copy'), 1600);
-      }
-      if (status) status.textContent = 'Copied to the clipboard';
-    } catch {}
+      said = 'Copied to the clipboard';
+      if (label) label.textContent = 'Copied';
+    } catch {
+      said = 'Could not copy: select the command and copy it';
+      if (label) label.textContent = 'Select it';
+    }
+    setTimeout(() => label && (label.textContent = 'Copy'), 1600);
+    // Emptied first, so that copying the same command twice is said twice.
+    if (status) {
+      status.textContent = '';
+      setTimeout(() => (status.textContent = said), 50);
+    }
   });
 }
 
@@ -69,7 +76,7 @@ function animation(): void {
     button?.addEventListener('click', () => {
       const paused = panel.classList.toggle('paused');
       button.setAttribute('aria-pressed', String(paused));
-      button.setAttribute('aria-label', paused ? 'Play the animation' : 'Pause the animation');
+      button.setAttribute('aria-label', paused ? 'paused, play the animation' : 'running, pause the animation');
     });
   });
 }
