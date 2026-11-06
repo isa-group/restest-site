@@ -7,9 +7,9 @@ APIs. It will hold three parts, each added in a pull request of its own:
 - `/`, the landing page: what RESTest is, and how to start;
 - `/showcase`, what RESTest finds on real APIs.
 
-The documentation is built; the landing page and the showcase are not yet, and `/` leads to `/docs/`
-until the landing page exists. The site is built with [Astro](https://astro.build) and the
-documentation with [Starlight](https://starlight.astro.build), and both are published on GitHub Pages.
+The documentation and the landing page are built; the showcase is not yet. The site is built with
+[Astro](https://astro.build) and the documentation with [Starlight](https://starlight.astro.build),
+and both are published on GitHub Pages.
 
 ## Building it
 
@@ -76,6 +76,34 @@ diagram that sets its own colours keeps them in both themes, and any other follo
 than the text is drawn smaller to fit it, and a click shows it at its own size. Without JavaScript, the
 diagram's text is shown.
 
+## The landing page
+
+[`src/pages/index.astro`](src/pages/index.astro) is the site's first page, in the look the mock-up
+settled: a centred top with four ways to start, each a command to copy, then horizontal bands that
+appear as they are reached. It is no page of Starlight's: [`src/layouts/Landing.astro`](src/layouts/Landing.astro)
+draws its bar along the top and its foot, and [`src/styles/landing.css`](src/styles/landing.css) its
+look, from the same tokens.
+
+- **The run it shows** is the one RESTest's manual keeps, in `docs/manual/images/clinic-run/` at the
+  version the site documents, held there by a test of RESTest's. `scripts/sync-docs.mjs` copies its six
+  pictures of `report.html` and writes what the page shows of its `report.json`, in
+  `src/generated/landing-run.json` ([`scripts/lib/landing-run.mjs`](scripts/lib/landing-run.mjs)): the
+  version, the counts and one written fault of each kind, as `report.html` shows it. The animation of
+  the first band shows those, and the second band the pictures, in the theme the reader picked and in
+  two sizes, for ordinary and sharp screens. A version that keeps no run, such as 2.4.0, has a first
+  page without those two bands.
+- **The band for coding agents** links RESTest's page for them, which RESTest has from 2.5.0 on; a
+  version without it has a first page without that band. The prompt it gives, in
+  [`src/components/landing/prompt.ts`](src/components/landing/prompt.ts), is the one RESTest's README
+  and that page give.
+- **Every link to a page of the documentation** is looked up among the pages built, and the build
+  stops if one is not there, naming it: the first page links chapters of the manual by name.
+- **Without JavaScript**, everything shows: the four commands one under another, the faults as a list
+  and the three views of the report. With less motion asked for, nothing moves; the animation's
+  button pauses it otherwise.
+- **The theme** is picked with the same three buttons as the documentation, and kept apart from it,
+  under `restest-landing-theme`.
+
 ### When it is rebuilt
 
 [`.github/workflows/site.yml`](.github/workflows/site.yml) builds the site on every pull request and
@@ -99,7 +127,10 @@ still builds from what the next version will be.
   middle of the window, with the header lined up on them.
 - [`src/components/ThemeSelect.astro`](src/components/ThemeSelect.astro) — the colour theme in one
   click, with three buttons, following the system, light and dark, in place of Starlight's drop-down;
-  in the header, on a phone too.
+  in the header, on a phone too, and on the landing page, which keeps its own choice.
+- [`src/styles/landing.css`](src/styles/landing.css) — the landing page in that look, as the mock-up
+  drew it; the black box of its animation keeps colours of its own. The page preloads Space Grotesk,
+  the face of its title.
 - [`src/assets/logo.svg`](src/assets/logo.svg) and [`src/assets/logo-dark.svg`](src/assets/logo-dark.svg)
   — RESTest's logo, for light and dark backgrounds, with the check in the accent colour. Being images, they
   cannot read `tokens.css`: they repeat its `--rt-text` and `--rt-accent` by value, and change with them.
