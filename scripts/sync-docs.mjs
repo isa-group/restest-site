@@ -7,7 +7,9 @@
 // It writes, all of it ignored by git: the pages in src/content/docs/docs/, the images they use in
 // public/source/, the sidebar in src/generated/sidebar.json and public/llms.txt. It fails, naming the
 // file in RESTest, on anything the site cannot be built from: a page with no title, a link to nothing,
-// an index that lists no page.
+// an index that lists no page. For the first page it writes src/generated/landing.json: the version the site
+// publishes and, when the version keeps the run its manual pictures, what it shows of that run, whose
+// pictures it copies into src/generated/clinic-run/.
 
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -17,6 +19,7 @@ import { parseArgs } from 'node:util';
 import { base, repository } from '../site.config.mjs';
 import { createResolver } from './lib/links.mjs';
 import { llmsTxt } from './lib/llms.mjs';
+import { AGENTS_PAGE, askingSentence, landingRun, PICTURES, RUN } from './lib/landing-run.mjs';
 import { DocumentationError } from './lib/markdown.mjs';
 import { addressPages, buildPage } from './lib/pages.mjs';
 import { isRefName, isRelease } from './lib/refs.mjs';
@@ -26,7 +29,8 @@ const site = fileURLToPath(new URL('..', import.meta.url));
 
 function main() {
   const { values } = parseArgs({ options: { ref: { type: 'string' }, from: { type: 'string' } } });
-  const ref = values.ref ?? (values.from ? 'master' : publishedVersion());
+  const published = publishedVersion();
+  const ref = values.ref ?? (values.from ? 'master' : published);
   if (!isRefName(ref)) fail(`--ref ${ref} is not the name of a tag or a branch`);
   const source = values.from ? resolve(values.from) : clone(ref);
   const badge = values.from ? 'local' : ref;
@@ -76,7 +80,17 @@ function main() {
     raw: `${repository.replace('https://github.com/', 'https://raw.githubusercontent.com/')}/${ref}`,
     overviewTitle,
   }));
-  console.log(`Copied ${slugs.size} pages and ${used.size} images of ${describes}${values.from ? `, from ${source}` : ''}`);
+  // What the first page shows: the version the site publishes, which its Docker command installs; the run of a
+  // version that keeps one; and what the page for coding agents tells a person to give their agent; or null.
+  const kept = files.has(`${RUN}/report.json`);
+  const run = kept ? landingRun(JSON.parse(read(`${RUN}/report.json`))) : null;
+  const prompt = files.has(AGENTS_PAGE) ? askingSentence(read(AGENTS_PAGE)) : null;
+  write(join(generated, 'landing.json'), `${JSON.stringify({ version: published.slice(1), prompt, run }, null, 2)}\n`);
+  if (kept) {
+    mkdirSync(join(generated, 'clinic-run'), { recursive: true });
+    for (const picture of PICTURES) copyFileSync(plain(`${RUN}/${picture}`), join(generated, 'clinic-run', picture));
+  }
+  console.log(`Copied ${slugs.size} pages and ${used.size} images of ${describes}${kept ? ', and the run its first page shows' : ''}${values.from ? `, from ${source}` : ''}`);
 }
 
 /** The version the site publishes: the one line of restest-version, which RESTest writes on a release. */

@@ -1,0 +1,64 @@
+---
+/*
+ * How to start, each way a command to copy: asking a coding agent, Homebrew, jbang and Docker. Tabs pick one;
+ * without JavaScript, all are written out under their names, so that an agent reading the page finds every
+ * command in it. The first, for a coding agent, is there when the documentation has its page for them.
+ */
+import { copyIcon } from './icons';
+import { tab, panel } from './tabs';
+
+interface Props {
+  version: string;
+  prompt: string | null;
+}
+const { version, prompt } = Astro.props;
+
+const ways = [
+  prompt && {
+    id: 'agent',
+    name: 'Coding agent',
+    command: prompt,
+    note: 'Paste it into your favourite coding agent: the agent installs RESTest and runs it for you.',
+  },
+  {
+    id: 'homebrew',
+    name: 'Homebrew',
+    command: 'brew install isa-group/tap/restest',
+    note: 'On macOS and Linux. It installs the Java RESTest runs on, too.',
+  },
+  {
+    id: 'jbang',
+    name: 'jbang',
+    command: 'jbang app install restest@https://isa-group.github.io/jbang-catalog/jbang-catalog.json',
+    note: 'On macOS, Linux and Windows. It downloads a Java when there is none.',
+  },
+  {
+    id: 'docker',
+    name: 'Docker',
+    command: `docker run --rm -v "$PWD:/work" ghcr.io/isa-group/restest:${version} version`,
+    note: 'Nothing to install but Docker. The manual says how to use it as a command.',
+  },
+].filter((way) => !!way);
+---
+
+<div class="install" data-tabs>
+  <div class="tabs" role="tablist" aria-label="Ways to start">
+    {ways.map((way, i) => <button {...tab('start', way.id, i === 0)}>{way.name}</button>)}
+  </div>
+  {
+    ways.map((way, i) => (
+      <div {...panel('start', way.id, i === 0)}>
+        <p class="inst-name">{way.name}</p>
+        <div class="cmd">
+          <code>{way.command}</code>
+          <button type="button" class="copy" data-copy={way.command}>
+            <Fragment set:html={copyIcon} />
+            <span>Copy</span>
+          </button>
+        </div>
+        <p class="inst-note">{way.note}</p>
+      </div>
+    ))
+  }
+  <p class="sr" role="status" data-copied></p>
+</div>
