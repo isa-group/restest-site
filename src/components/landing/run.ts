@@ -13,6 +13,7 @@ export interface LandingFault {
 export interface LandingRun {
   version: string | null;
   title: string | null;
+  minutes: number | null;
   operations: number;
   requests: number;
   errors: number;
@@ -21,3 +22,13 @@ export interface LandingRun {
   operationsWithWarnings: number;
   faults: LandingFault[];
 }
+
+/** What scripts/sync-docs.mjs writes for the first page: the version the site publishes, and the run. */
+export interface Landing {
+  version: string;
+  run: LandingRun | null;
+}
+
+/** The run's length in words: "a minute", "5 minutes". */
+export const minutesInWords = (minutes: number | null) =>
+  minutes === 1 ? 'a minute' : minutes ? `${minutes} minutes` : 'its budget';

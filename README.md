@@ -87,13 +87,14 @@ look, from the same tokens.
 - **The run it shows** is the one RESTest's manual keeps, in `docs/manual/images/clinic-run/` at the
   version the site documents, held there by a test of RESTest's. `scripts/sync-docs.mjs` copies its six
   pictures of `report.html` and writes what the page shows of its `report.json`, in
-  `src/generated/landing-run.json` ([`scripts/lib/landing-run.mjs`](scripts/lib/landing-run.mjs)): the
-  version, the counts and one written fault of each kind, as `report.html` shows it. The animation of
+  `src/generated/landing.json` ([`scripts/lib/landing-run.mjs`](scripts/lib/landing-run.mjs)) beside
+  the version the site publishes: the version that made the run, its minutes, its counts and one written
+  fault of each kind, as `report.html` shows it. The animation of
   the first band shows those, and the second band the pictures, in the theme the reader picked and in
   two sizes, for ordinary and sharp screens. A version that keeps no run, such as 2.4.0, has a first
   page without those two bands.
-- **The band for coding agents** links RESTest's page for them, which RESTest has from 2.5.0 on; a
-  version without it has a first page without that band. The prompt it gives, in
+- **The band for coding agents** and the first way to start link RESTest's page for them, which RESTest
+  has from 2.5.0 on; a version without it has a first page without either. The prompt it gives, in
   [`src/components/landing/prompt.ts`](src/components/landing/prompt.ts), is the one RESTest's README
   and that page give.
 - **Every link to a page of the documentation** is looked up among the pages built, and the build

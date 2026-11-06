@@ -3,10 +3,12 @@
  * report.html of the run, in three views a tab picks: the top of the page, an operation opened at a fault,
  * and what was found. The pictures are RESTest's own, from its manual, in the theme the reader picked,
  * taken at twice the page's resolution so that their text stays sharp on any screen; the browser fetches
- * the size the screen needs. Without JavaScript, the three are shown one under another.
+ * the size the screen needs, and only for the view shown. The frame keeps the height of the tallest, so that
+ * picking a tab moves nothing below it. Without JavaScript, the three are shown one under another.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { tab, panel } from './tabs';
 
 interface Props {
   title: string | null;
@@ -31,37 +33,26 @@ const views = [
     alt: 'What was found in report.html: each kind of fault, errors first, with what to look at, the classes of status code it came back in, and on how many operations',
   },
 ];
+const tallest = Object.values(pictures).reduce((a, b) => (b.height / b.width > a.height / a.width ? b : a));
 ---
 
 <div class="rp" data-tabs>
   <div class="tabs rp-tabs" role="tablist" aria-label="Parts of the report">
-    {
-      views.map((view, i) => (
-        <button
-          type="button"
-          role="tab"
-          id={`view-${view.id}`}
-          aria-controls={`view-${view.id}-panel`}
-          aria-selected={String(i === 0)}
-          tabindex={i === 0 ? 0 : -1}
-        >
-          {view.name}
-        </button>
-      ))
-    }
+    {views.map((view, i) => <button {...tab('view', view.id, i === 0)}>{view.name}</button>)}
   </div>
   <div class="rp-win">
     <div class="rp-bar" aria-hidden="true"><i></i><i></i><i></i><span>report.html{title && ` — ${title}`}</span></div>
-    <div class="rp-views">
+    <div class="rp-views" style={`--rp-ratio: ${tallest.width} / ${tallest.height}`}>
       {
         views.map((view, i) => (
-          <div role="tabpanel" id={`view-${view.id}-panel`} aria-labelledby={`view-${view.id}`} class={i === 0 ? 'on' : undefined}>
+          <div {...panel('view', view.id, i === 0)}>
             <h3>{view.name}</h3>
             {['light', 'dark'].map((theme) => (
               <Image
                 class={`for-${theme}`}
                 src={pictures[`${view.id}-${theme}`]}
                 alt={view.alt}
+                width={2160}
                 widths={[1080, 2160]}
                 sizes="(min-width: 1112px) 1078px, calc(100vw - 34px)"
                 quality={90}

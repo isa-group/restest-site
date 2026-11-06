@@ -5,6 +5,7 @@ import { landingRun, PICTURES } from '../scripts/lib/landing-run.mjs';
 const report = {
   tool: { name: 'RESTest', version: '2.4.0' },
   api: { title: 'REST Petclinic backend API documentation' },
+  timeline: { budget: 'PT1M' },
   totals: { requests: 46136, errors: 6800, operationsWithErrors: 30, warnings: 18520, operationsWithWarnings: 39 },
   operations: [
     { operation: 'addUser', method: 'POST', path: '/api/users' },
@@ -29,6 +30,9 @@ test('the four counts, on how many operations, and the operations the document h
   const run = landingRun(report);
   assert.equal(run.version, '2.4.0');
   assert.equal(run.title, 'REST Petclinic backend API documentation');
+  assert.equal(run.minutes, 1);
+  assert.equal(landingRun({ ...report, timeline: { budget: 'PT1H30M' } }).minutes, 90);
+  assert.equal(landingRun({ ...report, timeline: { budget: 'PT45S' } }).minutes, null);
   assert.deepEqual(
     [run.requests, run.errors, run.operationsWithErrors, run.warnings, run.operationsWithWarnings, run.operations],
     [46136, 6800, 30, 18520, 39, 3],
@@ -58,15 +62,9 @@ test('a kind counted with no fault written out is left out, and a fault with no 
   assert.equal(run.faults.find((fault) => fault.code === 'F920').status, null);
 });
 
-test('a sentence is kept on one line, with nothing that draws nothing, and cut when the card has no room', () => {
+test('a sentence is kept on one line, with nothing that draws nothing', () => {
   const run = landingRun(report);
   assert.equal(run.faults[1].summary, 'Sent "\\t" for query parameter \'page\'');
-  const long = landingRun({
-    ...report,
-    findings: [{ category: { code: 100 }, operation: 'addUser', summary: `sent "${'x'.repeat(400)}"`, status: 500 }],
-  });
-  assert.equal(long.faults[0].summary.length, 150);
-  assert.ok(long.faults[0].summary.endsWith('…'));
 });
 
 test('a fault on an operation the report does not list has no method and no path', () => {

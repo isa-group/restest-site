@@ -47,15 +47,13 @@ const choices = [
 {/* Marks the stored choice before the page is drawn, as Starlight does with its drop-down. */}
 <script is:inline>
   (() => {
-    document.querySelectorAll('rt-theme-select').forEach((picker) => {
-      let choice = '';
-      try {
-        choice = localStorage.getItem(picker.dataset.key) || '';
-      } catch {}
-      choice = choice === 'light' || choice === 'dark' ? choice : 'auto';
-      picker.querySelectorAll('button').forEach((button) => {
-        button.setAttribute('aria-pressed', String(button.dataset.choice === choice));
-      });
+    let choice = '';
+    try {
+      choice = localStorage.getItem(document.querySelector('rt-theme-select').dataset.key) || '';
+    } catch {}
+    choice = choice === 'light' || choice === 'dark' ? choice : 'auto';
+    document.querySelectorAll('rt-theme-select button').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.choice === choice));
     });
   })();
 </script>

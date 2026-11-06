@@ -22,6 +22,8 @@ interface Props {
 const { title, description, version, links } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const canonical = new URL(base, site).href;
+/** Where the first page keeps the reader's choice of theme, apart from the documentation's. */
+const themeKey = 'restest-landing-theme';
 ---
 
 <!doctype html>
@@ -40,13 +42,13 @@ const canonical = new URL(base, site).href;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     {/* Before the page is drawn: the theme the reader picked here, and a class saying the script runs. */}
-    <script is:inline>
+    <script is:inline define:vars={{ themeKey }}>
       (() => {
         const root = document.documentElement;
         root.classList.add('js');
         let choice = '';
         try {
-          choice = localStorage.getItem('restest-landing-theme') || '';
+          choice = localStorage.getItem(themeKey) || '';
         } catch {}
         root.dataset.theme =
           choice === 'light' || choice === 'dark'
@@ -70,7 +72,7 @@ const canonical = new URL(base, site).href;
       <div class="nav-right">
         <span class="ver">v{version}</span>
         <a class="gh" href={repository}><Fragment set:html={githubIcon} /><span>GitHub</span></a>
-        <ThemeSelect storageKey="restest-landing-theme" />
+        <ThemeSelect storageKey={themeKey} />
         <a class="btn" href={links.start}>Get started</a>
       </div>
     </header>

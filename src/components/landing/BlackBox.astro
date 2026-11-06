@@ -8,13 +8,14 @@
  * reader who asked for less motion. A narrow panel draws the run downwards instead, so that no text is
  * drawn smaller than the page's smallest.
  */
-import type { LandingRun } from './run';
+import { minutesInWords, type LandingRun } from './run';
 
 interface Props {
   run: LandingRun;
 }
 const { run } = Astro.props;
 const number = (n: number) => n.toLocaleString('en-US');
+const length = minutesInWords(run.minutes);
 
 // The lanes from RESTest to the API, each with the method of the request it carries and the class of its reply.
 const from = { x: 210, y: 205 };
@@ -34,7 +35,7 @@ const cycle = `@keyframes cycle{0%{opacity:0;transform:translateY(8px)}${(slot *
 
 <div class="panel">
   <div class="panel-h">
-    <span>Spring PetClinic REST · 1 min</span>
+    <span>Spring PetClinic REST · {run.minutes ?? '?'} min</span>
     <button type="button" class="live" aria-pressed="false" aria-label="Pause the animation">
       <i aria-hidden="true"></i><span class="when-running">running</span><span class="when-paused">paused</span>
     </button>
@@ -55,7 +56,7 @@ const cycle = `@keyframes cycle{0%{opacity:0;transform:translateY(8px)}${(slot *
     <g class="node">
       <rect x="20" y="170" width="190" height="70" rx="10"></rect>
       <text class="t1" x="38" y="201">restest run</text>
-      <text class="t2" x="38" y="227">a minute</text>
+      <text class="t2" x="38" y="227">{length}</text>
     </g>
     {lanes.map((lane) => <path class="lane" d={`M${from.x} ${from.y} L${apiLeft} ${lane.y}`}></path>)}
     <g class="api">
@@ -86,7 +87,7 @@ const cycle = `@keyframes cycle{0%{opacity:0;transform:translateY(8px)}${(slot *
   <div class="bb-v" aria-hidden="true">
     <div class="node"><b>OpenAPI</b><span>{run.operations} operations</span></div>
     <div class="feed"></div>
-    <div class="node"><b>restest run</b><span>a minute</span></div>
+    <div class="node"><b>restest run</b><span>{length}</span></div>
     <div class="methods">{lanes.map((lane) => <span style={`--delay:${lane.delay}`}>{lane.method}</span>)}</div>
     <div class="node api"><b>API</b><span>a black box</span></div>
   </div>

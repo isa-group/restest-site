@@ -8,12 +8,9 @@ export const VIEWS = ['summary', 'fault', 'found'];
 
 export const PICTURES = VIEWS.flatMap((view) => [`${view}-light.png`, `${view}-dark.png`]);
 
-/** The most characters a fault's sentence may take on the page, whose card has room for two lines. */
-const LONGEST = 150;
-
 /**
- * What the first page shows of a run, from its report.json: the version that made it, its four counts
- * and on how many operations, and one written fault of each kind, the kinds in the order report.html's
+ * What the first page shows of a run, from its report.json: the version that made it, the minutes it was
+ * given, its counts and on how many operations, and one written fault of each kind, the kinds in the order report.html's
  * "What was found" gives them, errors first, then by how often they were found. Each fault is worded as
  * report.html shows it when its operation is opened: the finding's sentence, with a capital. A kind the
  * report counted without writing one out is left out; a fault that got no reply has no status.
@@ -42,6 +39,7 @@ export function landingRun(report) {
   return {
     version: report.tool?.version ?? null,
     title: report.api?.title ?? null,
+    minutes: minutes(report.timeline?.budget),
     operations: (report.operations ?? []).length,
     requests: totals.requests ?? 0,
     errors: totals.errors ?? 0,
@@ -56,8 +54,11 @@ const rank = (kind) => (kind.severity === 'error' ? 0 : 1);
 
 const capital = (text) => (text ? text[0].toUpperCase() + text.slice(1) : text);
 
-/** On one line, with no character that draws nothing, and cut short when the card has no room for it. */
-function clean(text) {
-  const flat = String(text ?? '').replace(/[\p{Cc}\p{Cf}\s]+/gu, ' ').trim();
-  return flat.length > LONGEST ? `${flat.slice(0, LONGEST - 1).trimEnd()}…` : flat;
+/** On one line, with no character that draws nothing; RESTest has already shortened any value it quotes. */
+const clean = (text) => String(text ?? '').replace(/[\p{Cc}\p{Cf}\s]+/gu, ' ').trim();
+
+/** How many minutes the run was given, from its budget as report.json writes it (PT1M), or null. */
+function minutes(budget) {
+  const match = /^PT(?:(\d+)H)?(?:(\d+)M)?$/.exec(budget ?? '');
+  return match && (match[1] || match[2]) ? Number(match[1] ?? 0) * 60 + Number(match[2] ?? 0) : null;
 }

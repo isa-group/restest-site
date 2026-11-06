@@ -1,22 +1,23 @@
 ---
 /*
- * How to start, in four ways, each a command to copy: asking a coding agent, Homebrew, jbang and Docker.
- * Tabs pick one; without JavaScript, all four are written out under their names, so that an agent reading
- * the page finds every command in it.
+ * How to start, each way a command to copy: asking a coding agent, Homebrew, jbang and Docker. Tabs pick one;
+ * without JavaScript, all are written out under their names, so that an agent reading the page finds every
+ * command in it. The first, for a coding agent, is there when the documentation has its page for them.
  */
 import { copyIcon } from './icons';
-import { agentPrompt } from './prompt';
+import { tab, panel } from './tabs';
 
 interface Props {
   version: string;
+  prompt: string | null;
 }
-const { version } = Astro.props;
+const { version, prompt } = Astro.props;
 
 const ways = [
-  {
+  prompt && {
     id: 'agent',
     name: 'Coding agent',
-    command: agentPrompt,
+    command: prompt,
     note: 'Paste it into your favourite coding agent: the agent installs RESTest and runs it for you.',
   },
   {
@@ -37,29 +38,16 @@ const ways = [
     command: `docker run --rm -v "$PWD:/work" ghcr.io/isa-group/restest:${version} version`,
     note: 'Nothing to install but Docker. The manual says how to use it as a command.',
   },
-];
+].filter((way) => !!way);
 ---
 
 <div class="install" data-tabs>
   <div class="tabs" role="tablist" aria-label="Ways to start">
-    {
-      ways.map((way, i) => (
-        <button
-          type="button"
-          role="tab"
-          id={`start-${way.id}`}
-          aria-controls={`start-${way.id}-panel`}
-          aria-selected={String(i === 0)}
-          tabindex={i === 0 ? 0 : -1}
-        >
-          {way.name}
-        </button>
-      ))
-    }
+    {ways.map((way, i) => <button {...tab('start', way.id, i === 0)}>{way.name}</button>)}
   </div>
   {
     ways.map((way, i) => (
-      <div role="tabpanel" id={`start-${way.id}-panel`} aria-labelledby={`start-${way.id}`} class={i === 0 ? 'on' : undefined}>
+      <div {...panel('start', way.id, i === 0)}>
         <p class="inst-name">{way.name}</p>
         <div class="cmd">
           <code>{way.command}</code>

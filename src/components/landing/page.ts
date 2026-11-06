@@ -1,5 +1,5 @@
 // What the first page does in the browser: tabs, copying a command, bands that appear as they are reached,
-// and pausing the animation. Without it the page shows everything, still.
+// and the animation, paused by its button or while it is out of view. Without it the page shows everything.
 
 /** Tabs, with the keyboard as well: the arrows, Home and End move between them, and the picked one shows. */
 function tabs(group: HTMLElement): void {
@@ -45,11 +45,6 @@ function copying(root: HTMLElement): void {
 
 /** Each band appears once it comes into view. */
 function bands(): void {
-  const all = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window)) {
-    all.forEach((band) => band.classList.add('in'));
-    return;
-  }
   const seen = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -60,12 +55,16 @@ function bands(): void {
     },
     { rootMargin: '0px 0px -12% 0px' },
   );
-  all.forEach((band) => seen.observe(band));
+  document.querySelectorAll('.reveal').forEach((band) => seen.observe(band));
 }
 
-/** The animation's button: pause, and play again. */
-function pausing(): void {
+/** The animation runs while it is in view, unless its button paused it. */
+function animation(): void {
+  const away = new IntersectionObserver((entries) => {
+    for (const entry of entries) entry.target.classList.toggle('away', !entry.isIntersecting);
+  });
   document.querySelectorAll<HTMLElement>('.panel').forEach((panel) => {
+    away.observe(panel);
     const button = panel.querySelector<HTMLButtonElement>('.live');
     button?.addEventListener('click', () => {
       const paused = panel.classList.toggle('paused');
@@ -79,5 +78,5 @@ export function start(): void {
   document.querySelectorAll<HTMLElement>('[data-tabs]').forEach(tabs);
   document.querySelectorAll<HTMLElement>('.install').forEach(copying);
   bands();
-  pausing();
+  animation();
 }

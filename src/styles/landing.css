@@ -12,7 +12,6 @@
   --box-fill: light-dark(#0b0d10, #000000);
   --box-text: #f1f3f6;
   --box-text-2: light-dark(#9aa3af, #8b94a1);
-  --btn-radius: 9px;
 }
 
 *,
@@ -44,9 +43,7 @@ button {
   cursor: pointer;
 }
 
-code,
-pre,
-kbd {
+code {
   font-family: var(--rt-font-mono);
 }
 
@@ -73,8 +70,6 @@ kbd {
 
 /* The top bar. */
 .nav {
-  position: relative;
-  z-index: 3;
   display: flex;
   align-items: center;
   gap: 28px;
@@ -112,7 +107,7 @@ kbd {
   padding: 6px 9px;
   border: 1px solid var(--rt-line);
   border-radius: 999px;
-  font: 500 14px/1 var(--rt-font-mono);
+  font: 500 var(--rt-text-min)/1 var(--rt-font-mono);
   color: var(--rt-text-2);
 }
 
@@ -131,7 +126,7 @@ kbd {
   height: 40px;
   padding: 0 18px;
   border: 0;
-  border-radius: var(--btn-radius);
+  border-radius: 9px;
   background: var(--rt-accent);
   color: var(--rt-on-accent);
   font-size: 15px;
@@ -147,7 +142,6 @@ kbd {
 
 /* The top of the page. */
 .hero {
-  position: relative;
   padding: 96px 40px 104px;
   overflow: hidden;
   text-align: center;
@@ -176,11 +170,16 @@ kbd {
   text-align: left;
 }
 
+/* The tabs are drawn only when the script that picks between them runs. */
 .tabs {
-  display: flex;
+  display: none;
   gap: 2px;
   overflow-x: auto;
   scrollbar-width: none;
+}
+
+.js .tabs {
+  display: flex;
 }
 
 .tabs button {
@@ -190,7 +189,7 @@ kbd {
   border-radius: 8px 8px 0 0;
   background: transparent;
   color: var(--rt-text-3);
-  font-size: 14px;
+  font-size: var(--rt-text-min);
   font-weight: 500;
 }
 
@@ -212,7 +211,7 @@ kbd {
 .cmd code {
   flex: 1;
   min-width: 0;
-  font-size: 14px;
+  font-size: var(--rt-text-min);
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
@@ -228,7 +227,7 @@ kbd {
   border-radius: 8px;
   background: var(--rt-surface-2);
   color: var(--rt-text-2);
-  font-size: 14px;
+  font-size: var(--rt-text-min);
 }
 
 .copy:hover {
@@ -237,7 +236,7 @@ kbd {
 
 .inst-note {
   margin: 8px 2px 0;
-  font-size: 14px;
+  font-size: var(--rt-text-min);
   line-height: 1.45;
   color: var(--rt-text-3);
 }
@@ -245,7 +244,7 @@ kbd {
 /* Without JavaScript each command comes under its own name; with it, the tabs pick one. */
 .inst-name {
   margin: 18px 2px 6px;
-  font-size: 14px;
+  font-size: var(--rt-text-min);
   font-weight: 600;
   color: var(--rt-text-2);
 }
@@ -253,14 +252,6 @@ kbd {
 .js .install .tabs ~ [role='tabpanel']:not(.on),
 .js .inst-name {
   display: none;
-}
-
-.tabs {
-  display: none;
-}
-
-.js .tabs {
-  display: flex;
 }
 
 /* The bands. */
@@ -298,7 +289,7 @@ kbd {
 
 .kicker {
   margin-bottom: 16px;
-  font: 500 14px/1 var(--rt-font-mono);
+  font: 500 var(--rt-text-min)/1 var(--rt-font-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--rt-accent-text);
@@ -314,7 +305,8 @@ kbd {
   color: var(--rt-accent-text);
 }
 
-.band p {
+.band-copy p,
+.band-head p {
   max-width: 620px;
   margin: 0 0 22px;
   font-size: 17px;
@@ -367,7 +359,7 @@ kbd {
   height: 28px;
   border: 1px solid var(--rt-line-strong);
   border-radius: 50%;
-  font: 600 14px var(--rt-font-mono);
+  font: 600 var(--rt-text-min) var(--rt-font-mono);
   color: var(--rt-accent-text);
 }
 
@@ -377,7 +369,7 @@ kbd {
   color: var(--rt-text);
 }
 
-/* 01: the run, as an animation of the black box. */
+/* How it works: the run, as an animation of the black box. */
 .panel {
   container-type: inline-size;
   overflow: hidden;
@@ -394,7 +386,7 @@ kbd {
   gap: 12px;
   padding: 10px 12px 10px 16px;
   border-bottom: 1px solid var(--rt-line);
-  font: 500 14px/1.3 var(--rt-font-mono);
+  font: 500 var(--rt-text-min)/1.3 var(--rt-font-mono);
   color: var(--rt-text-3);
 }
 
@@ -407,7 +399,6 @@ kbd {
   border-radius: 999px;
   background: transparent;
   color: var(--rt-accent-text);
-  font: inherit;
 }
 
 .live:hover {
@@ -577,7 +568,7 @@ kbd {
 .bb-v {
   display: none;
   padding: 16px 16px 0;
-  font: 400 14px/1.4 var(--rt-font-mono);
+  font: 400 var(--rt-text-min)/1.4 var(--rt-font-mono);
 }
 
 .bb-v .node {
@@ -586,7 +577,7 @@ kbd {
   gap: 10px;
   padding: 10px 14px;
   border: 1px solid var(--rt-line-strong);
-  border-radius: 10px;
+  border-radius: var(--rt-radius);
   background: var(--rt-surface-2);
   color: var(--rt-text-3);
 }
@@ -664,17 +655,13 @@ kbd {
   list-style: none;
 }
 
-.js .faults {
-  gap: 0;
-}
-
 .fault {
   padding: 12px 14px;
   border: 1px solid var(--rt-line);
   border-left: 3px solid var(--rt-error);
   border-radius: 8px;
   background: var(--rt-surface-2);
-  font: 400 14px/1.5 var(--rt-font-mono);
+  font: 400 var(--rt-text-min)/1.5 var(--rt-font-mono);
 }
 
 .js .fault {
@@ -685,23 +672,6 @@ kbd {
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-delay: calc(var(--n) * 4s);
-}
-
-@keyframes cycle {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  3%,
-  18% {
-    opacity: 1;
-    transform: none;
-  }
-  21%,
-  100% {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
 }
 
 .fault.warning {
@@ -750,9 +720,14 @@ kbd {
   font-weight: 600;
   line-height: 1.4;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.paused :is(.req, .rep, .fault, .live i, .methods span) {
+/* Paused by its button, or while it is out of view. */
+:is(.paused, .away) :is(.req, .rep, .fault, .live i, .methods span) {
   animation-play-state: paused;
 }
 
@@ -765,7 +740,7 @@ kbd {
 
 .counts div {
   padding: 12px 16px;
-  font: 400 14px/1.35 var(--rt-font-mono);
+  font: 400 var(--rt-text-min)/1.35 var(--rt-font-mono);
   color: var(--rt-text-3);
 }
 
@@ -799,7 +774,7 @@ kbd {
   }
 }
 
-/* 02: the report, in three views. */
+/* The report, in three views. */
 .rp {
   max-width: 1080px;
   margin: 0 auto;
@@ -842,7 +817,7 @@ kbd {
   height: 38px;
   padding: 0 14px;
   border-bottom: 1px solid var(--rt-line);
-  font-size: 14px;
+  font-size: var(--rt-text-min);
   color: var(--rt-text-3);
 }
 
@@ -861,16 +836,13 @@ kbd {
   white-space: nowrap;
 }
 
+/* The frame keeps the tallest view's height, and a view not picked is not drawn, nor its picture fetched. */
 .js .rp-views {
-  display: grid;
-}
-
-.js .rp-views > [role='tabpanel'] {
-  grid-area: 1 / 1;
+  aspect-ratio: var(--rp-ratio);
 }
 
 .js .rp-views > [role='tabpanel']:not(.on) {
-  visibility: hidden;
+  display: none;
 }
 
 .rp-views img {
@@ -891,13 +863,13 @@ kbd {
 }
 
 .rp-cap {
-  margin: 14px auto 0 !important;
-  font-size: 14px !important;
+  margin: 14px auto 0;
+  font-size: var(--rt-text-min);
   text-align: center;
-  color: var(--rt-text-3) !important;
+  color: var(--rt-text-3);
 }
 
-/* 03: what a coding agent does. */
+/* What a coding agent does. */
 .flow {
   padding: 22px;
   border: 1px solid var(--rt-line);
@@ -920,11 +892,11 @@ kbd {
 }
 
 .flow .you .who {
-  font: 600 14px var(--rt-font-sans);
+  font: 600 var(--rt-text-min) var(--rt-font-sans);
 }
 
 .flow .you code {
-  font-size: 14px;
+  font-size: var(--rt-text-min);
   line-height: 1.5;
   overflow-wrap: anywhere;
   color: var(--rt-text);
@@ -957,7 +929,7 @@ kbd {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--rt-accent) 20%, transparent);
 }
 
-/* 04: the three inputs. */
+/* The three inputs of a run. */
 .cards3 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -979,7 +951,7 @@ kbd {
   padding: 3px 9px;
   border: 1px solid var(--rt-line-strong);
   border-radius: 999px;
-  font-size: 14px;
+  font-size: var(--rt-text-min);
   color: var(--rt-accent-text);
 }
 
@@ -993,6 +965,8 @@ kbd {
 .card p {
   margin: 0;
   font-size: 15px;
+  line-height: 1.6;
+  color: var(--rt-text-2);
 }
 
 .card-links {
@@ -1015,7 +989,7 @@ kbd {
   text-underline-offset: 3px;
 }
 
-/* 05: about us. */
+/* About us. */
 .band.contact {
   background: radial-gradient(700px 300px at 0% 100%, var(--rt-glow), transparent 70%), var(--rt-bg-tint);
 }
@@ -1053,7 +1027,7 @@ kbd {
   gap: 32px;
   max-width: 1180px;
   margin: 0 auto;
-  font-size: 14px;
+  font-size: var(--rt-text-min);
 }
 
 .foot-in > div {
@@ -1171,7 +1145,7 @@ kbd {
 
   .nav .btn {
     padding: 0 12px;
-    font-size: 14px;
+    font-size: var(--rt-text-min);
   }
 }
 
@@ -1193,10 +1167,6 @@ kbd {
   .bb-v .methods span {
     animation: none;
     opacity: 1;
-  }
-
-  .js .faults {
-    gap: 8px;
   }
 
   .js .fault {
