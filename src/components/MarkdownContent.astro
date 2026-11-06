@@ -1,0 +1,74 @@
+---
+/*
+ * The text of a page, as Starlight draws it, with its Mermaid diagrams drawn as pictures. Each diagram arrives
+ * as its text, from src/markdown/mermaid.mjs; Mermaid, loaded only on a page that has one, draws it in the
+ * browser, and draws it again when the reader changes the theme. A diagram that sets its own colours keeps
+ * them in both themes, as on GitHub; any other takes Mermaid's light or dark colours, after the site's theme.
+ * A diagram wider than the text is drawn smaller to fit it; the button under it, or a click on it, shows it
+ * at its own size over the page, where it scrolls if the window is narrower still.
+ */
+import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+---
+
+<Default><slot /></Default>
+
+<script>
+  async function drawDiagrams(diagrams: HTMLElement[]): Promise<void> {
+    const { default: mermaid } = await import('mermaid');
+    const sources = diagrams.map((diagram) => diagram.textContent ?? '');
+    let drawnIn: string | undefined;
+
+    // Mermaid sizes each label by measuring its text in the font given here, and leaves out of the picture
+    // a diagram's own font when it names a generic family such as `sans-serif`, so that the text is then
+    // drawn in the page's font. Measuring in the page's font, once it has loaded, keeps every label whole.
+    await document.fonts.ready;
+    const fontFamily = getComputedStyle(document.body).fontFamily;
+
+    async function draw(): Promise<void> {
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default';
+      if (theme === drawnIn) return;
+      drawnIn = theme;
+      mermaid.initialize({ startOnLoad: false, theme, fontFamily });
+      diagrams.forEach((diagram, i) => {
+        diagram.removeAttribute('data-processed');
+        diagram.textContent = sources[i];
+      });
+      await mermaid.run({ nodes: diagrams, suppressErrors: true });
+    }
+
+    // One drawing at a time: a change of theme while one is under way waits for it.
+    let drawing = draw();
+    new MutationObserver(() => {
+      drawing = drawing.then(draw);
+    }).observe(document.documentElement, { attributeFilter: ['data-theme'] });
+
+    const fullSize = document.createElement('dialog');
+    fullSize.className = 'rt-diagram';
+    fullSize.setAttribute('aria-label', 'The diagram at its own size');
+    fullSize.addEventListener('click', () => fullSize.close());
+    document.body.append(fullSize);
+
+    function showFullSize(diagram: HTMLElement): void {
+      const svg = diagram.querySelector('svg');
+      if (!svg) return;
+      const copy = svg.cloneNode(true) as SVGSVGElement;
+      copy.removeAttribute('style');
+      copy.setAttribute('width', String(svg.viewBox.baseVal.width));
+      fullSize.replaceChildren(copy);
+      fullSize.showModal();
+    }
+
+    for (const diagram of diagrams) {
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'rt-diagram-open';
+      open.textContent = 'Full size';
+      open.addEventListener('click', () => showFullSize(diagram));
+      diagram.after(open);
+      diagram.addEventListener('click', () => showFullSize(diagram));
+    }
+  }
+
+  const diagrams = [...document.querySelectorAll<HTMLElement>('.sl-markdown-content pre.mermaid')];
+  if (diagrams.length > 0) void drawDiagrams(diagrams);
+</script>

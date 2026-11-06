@@ -68,12 +68,23 @@ every link between them leads to a page and a heading that exist; it names the p
 the site, `docs/manual/settings.md` for RESTest's `docs/manual/07-settings.md`, and counts lines in the
 copy, whose first lines are the front matter.
 
+A code block marked `mermaid` is drawn as a diagram, as GitHub draws it.
+[`src/markdown/mermaid.mjs`](src/markdown/mermaid.mjs) turns the block into the diagram's text, and
+[`src/components/MarkdownContent.astro`](src/components/MarkdownContent.astro) has
+[Mermaid](https://mermaid.js.org) draw it in the browser, loaded only on a page that has a diagram. A
+diagram that sets its own colours keeps them in both themes, and any other follows the theme; one wider
+than the text is drawn smaller to fit it, and a click shows it at its own size. Without JavaScript, the
+diagram's text is shown.
+
 ### When it is rebuilt
 
 [`.github/workflows/site.yml`](.github/workflows/site.yml) builds the site on every pull request and
-publishes it on every push to `main`. A workflow of RESTest's is to write the version of each release it
-publishes into `restest-version`, so that the commit publishes the documentation of the new version;
-until it exists, the file is changed by hand.
+publishes it on every push to `main`. When RESTest publishes a release, its workflow
+[`documentation-site.yml`](https://github.com/isa-group/RESTest/blob/master/.github/workflows/documentation-site.yml)
+writes the version into `restest-version`, with a deploy key of this repository, so that the commit
+publishes the documentation of the new version; it then waits until `llms.txt` names that version, in
+its opening sentence. The file is never put back to an earlier version: if a release's pages do not
+build, the site is changed until they do.
 Every Monday the site is also built from RESTest's `master`, without publishing it, to say that it
 still builds from what the next version will be.
 
