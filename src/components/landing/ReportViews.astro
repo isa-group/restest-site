@@ -1,8 +1,9 @@
 ---
 /*
  * report.html of the run, in three views a tab picks: the top of the page, an operation opened at a fault,
- * and what was found. The pictures are RESTest's own, from its manual, in the theme the reader picked;
- * without JavaScript, the three are shown one under another.
+ * and what was found. The pictures are RESTest's own, from its manual, in the theme the reader picked,
+ * taken at twice the page's resolution so that their text stays sharp on any screen; the browser fetches
+ * the size the screen needs. Without JavaScript, the three are shown one under another.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -56,8 +57,17 @@ const views = [
         views.map((view, i) => (
           <div role="tabpanel" id={`view-${view.id}-panel`} aria-labelledby={`view-${view.id}`} class={i === 0 ? 'on' : undefined}>
             <h3>{view.name}</h3>
-            <Image class="for-light" src={pictures[`${view.id}-light`]} alt={view.alt} loading="lazy" />
-            <Image class="for-dark" src={pictures[`${view.id}-dark`]} alt={view.alt} loading="lazy" />
+            {['light', 'dark'].map((theme) => (
+              <Image
+                class={`for-${theme}`}
+                src={pictures[`${view.id}-${theme}`]}
+                alt={view.alt}
+                widths={[1080, 2160]}
+                sizes="(min-width: 1112px) 1078px, calc(100vw - 34px)"
+                quality={90}
+                loading="lazy"
+              />
+            ))}
           </div>
         ))
       }

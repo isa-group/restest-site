@@ -1,8 +1,8 @@
 ---
 /*
  * The run, as an animation: RESTest reads the OpenAPI document, sends requests to the API, a black box, and
- * gets replies back, while the faults it found go by one after another, worded as report.html words them,
- * above the run's four counts. Everything shown comes from the run whose report the next band pictures.
+ * gets replies back, while the faults it found go by one after another, each as report.html shows it when
+ * its operation is opened, above the run's counts. Everything shown comes from the run whose report the next band pictures.
  *
  * The requests move with CSS, so the button in the panel's corner can pause them, and nothing moves for a
  * reader who asked for less motion. A narrow panel draws the run downwards instead, so that no text is
@@ -106,7 +106,6 @@ const cycle = `@keyframes cycle{0%{opacity:0;transform:translateY(8px)}${(slot *
             </div>
           )}
           <div class="fs">{fault.summary}</div>
-          <div class="f4">{fault.advice}</div>
         </li>
       ))
     }
@@ -116,7 +115,6 @@ const cycle = `@keyframes cycle{0%{opacity:0;transform:translateY(8px)}${(slot *
     <div><b>{number(run.requests)}</b>requests sent</div>
     <div><b class="err">{number(run.errors)}</b>errors, on {run.operationsWithErrors} of {run.operations} operations</div>
     <div><b class="warn">{number(run.warnings)}</b>warnings, on {run.operationsWithWarnings} of {run.operations} operations</div>
-    <div><b>{run.operations}</b>operations in the document</div>
   </div>
 </div>
 <p class="note">

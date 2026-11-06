@@ -752,23 +752,13 @@ kbd {
   overflow-wrap: anywhere;
 }
 
-.fault .f4 {
-  margin: 2px 0;
-  font-family: var(--rt-font-sans);
-  color: var(--rt-text-2);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 .paused :is(.req, .rep, .fault, .live i, .methods span) {
   animation-play-state: paused;
 }
 
 .counts {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 14px;
   border-top: 1px solid var(--rt-line);
 }
@@ -800,15 +790,12 @@ kbd {
 
 @container (max-width: 560px) {
   .counts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .counts div:nth-child(3) {
-    border-left: 0;
-  }
-
-  .counts div:nth-child(n + 3) {
+  .counts div + div {
     border-top: 1px solid var(--rt-line);
+    border-left: 0;
   }
 }
 
@@ -1041,6 +1028,15 @@ kbd {
 
 .band.contact .band-head {
   margin-bottom: 0;
+}
+
+.band.contact p a,
+.rp-cap a,
+.foot-brand p a {
+  color: var(--rt-accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .links {

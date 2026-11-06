@@ -15,8 +15,8 @@ const LONGEST = 150;
  * What the first page shows of a run, from its report.json: the version that made it, its four counts
  * and on how many operations, and one written fault of each kind, the kinds in the order report.html's
  * "What was found" gives them, errors first, then by how often they were found. Each fault is worded as
- * report.html words it: the finding's sentence with a capital, the kind's advice as a sentence. A kind
- * the report counted without writing one out is left out; a fault that got no reply has no status.
+ * report.html shows it when its operation is opened: the finding's sentence, with a capital. A kind the
+ * report counted without writing one out is left out; a fault that got no reply has no status.
  */
 export function landingRun(report) {
   const operations = new Map((report.operations ?? []).map((operation) => [operation.operation, operation]));
@@ -36,7 +36,6 @@ export function landingRun(report) {
       path: operation?.path ?? null,
       status: Number.isInteger(found.status) ? found.status : null,
       summary: capital(clean(found.summary)),
-      advice: sentence(capital(clean(kind.advice))),
     });
   }
   const totals = report.totals ?? {};
@@ -56,8 +55,6 @@ export function landingRun(report) {
 const rank = (kind) => (kind.severity === 'error' ? 0 : 1);
 
 const capital = (text) => (text ? text[0].toUpperCase() + text.slice(1) : text);
-
-const sentence = (text) => (!text || /[.!?]$/.test(text) ? text : `${text}.`);
 
 /** On one line, with no character that draws nothing, and cut short when the card has no room for it. */
 function clean(text) {

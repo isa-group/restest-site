@@ -119,8 +119,9 @@ const agentSentence =
           </div>
           <ReportViews title={run.title} pictures={pictures} />
           <p class="rp-cap">
-            A real run: Spring PetClinic REST, tested for one minute by RESTest {run.version}. It ran in emulation on a
-            Mac with Apple silicon, and answered slowly until it had warmed up, as the timeline shows.
+            A real run: Spring PetClinic REST, as the{' '}
+            <a href="https://github.com/WebFuzzing/Dataset">Web Fuzzing Dataset</a> builds it, tested for one minute by
+            RESTest {run.version}.
           </p>
         </div>
       </section>
@@ -190,8 +191,9 @@ const agentSentence =
         <div class="kicker">{kicker('About us')}</div>
         <h2>Do you need help? <span class="second">Contact us.</span></h2>
         <p>
-          RESTest is developed by the SCORE Research Lab at the University of Seville (Spain). If you would like to try it
-          on your organisation's APIs and need help, let us know: we will be glad to help.
+          RESTest is developed by the SCORE Research Lab at the University of Seville (Spain). The current maintainer
+          is <a href="https://ssegura.github.io/">Prof. Sergio Segura</a>. If you would like to try it on your organisation's
+          APIs and need help, let us know, we will be glad to help.
         </p>
         <div class="links">
           <a class="btn" href="mailto:sergiosegura@us.es">Write to us <Fragment set:html={arrowIcon} /></a>

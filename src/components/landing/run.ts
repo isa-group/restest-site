@@ -8,7 +8,6 @@ export interface LandingFault {
   path: string | null;
   status: number | null;
   summary: string;
-  advice: string;
 }
 
 export interface LandingRun {

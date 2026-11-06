@@ -46,9 +46,7 @@ test('one written fault of each kind, errors first and then by how often, worded
     path: '/api/users',
     status: 500,
     summary: 'The API answered 500, so it fell over',
-    advice: "Look in the API's log.",
   });
-  assert.equal(run.faults[1].advice, 'Make the API refuse it.');
 });
 
 test('a kind counted with no fault written out is left out, and a fault with no reply has no status', () => {
