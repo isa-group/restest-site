@@ -5,6 +5,7 @@
  * the page finds every command in it.
  */
 import { copyIcon } from './icons';
+import { agentPrompt } from './prompt';
 
 interface Props {
   version: string;
@@ -15,8 +16,7 @@ const ways = [
   {
     id: 'agent',
     name: 'Coding agent',
-    command:
-      'Use RESTest to test the REST APIs you develop: https://github.com/isa-group/RESTest/blob/master/docs/for-coding-agents.md',
+    command: agentPrompt,
     note: 'Paste it into your favourite coding agent: the agent installs RESTest and runs it for you.',
   },
   {

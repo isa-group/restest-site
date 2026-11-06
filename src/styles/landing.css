@@ -799,12 +799,6 @@ kbd {
   }
 }
 
-.note {
-  margin-top: 10px;
-  font-size: 14px;
-  color: var(--rt-text-3);
-}
-
 /* 02: the report, in three views. */
 .rp {
   max-width: 1080px;

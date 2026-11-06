@@ -17,6 +17,7 @@ import BlackBox from '../components/landing/BlackBox.astro';
 import Install from '../components/landing/Install.astro';
 import ReportViews from '../components/landing/ReportViews.astro';
 import { arrowIcon, githubIcon } from '../components/landing/icons';
+import { agentPrompt } from '../components/landing/prompt';
 import type { LandingRun } from '../components/landing/run';
 import versionFile from '../../restest-version?raw';
 import { repository } from '../../site.config.mjs';
@@ -51,8 +52,7 @@ const pictures = Object.fromEntries(
 // The bands are numbered as they come, since two of them depend on the version.
 let numbered = 0;
 const kicker = (name: string) => `${String(++numbered).padStart(2, '0')} · ${name}`;
-const agentSentence =
-  'Use RESTest to test the REST APIs you develop: https://github.com/isa-group/RESTest/blob/master/docs/for-coding-agents.md';
+const agentSentence = agentPrompt;
 ---
 
 <Landing
@@ -191,9 +191,8 @@ const agentSentence =
         <div class="kicker">{kicker('About us')}</div>
         <h2>Do you need help? <span class="second">Contact us.</span></h2>
         <p>
-          RESTest is developed by the SCORE Research Lab at the University of Seville (Spain). The current maintainer
-          is <a href="https://ssegura.github.io/">Prof. Sergio Segura</a>. If you would like to try it on your organisation's
-          APIs and need help, let us know, we will be glad to help.
+          RESTest is developed by the SCORE Research Lab at the University of Seville (Spain). If you would like to try it
+          on your organisation's APIs and need help, let us know, we will be glad to help.
         </p>
         <div class="links">
           <a class="btn" href="mailto:sergiosegura@us.es">Write to us <Fragment set:html={arrowIcon} /></a>
