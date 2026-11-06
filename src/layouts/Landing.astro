@@ -1,0 +1,110 @@
+---
+/*
+ * The frame of the site's first page: its head, the bar along the top and the foot. The first page is no
+ * page of Starlight's, which draws the documentation; it shares the site's look, from tokens.css, and the
+ * three theme buttons, but keeps the reader's choice of theme apart from the documentation's.
+ */
+import ThemeSelect from '../components/ThemeSelect.astro';
+import { githubIcon } from '../components/landing/icons';
+import logo from '../assets/logo.svg';
+import logoDark from '../assets/logo-dark.svg';
+import textFont from '../assets/fonts/space-grotesk-latin-wght-normal.woff2?url';
+import '../styles/tokens.css';
+import '../styles/landing.css';
+import { repository, site } from '../../site.config.mjs';
+
+interface Props {
+  title: string;
+  description: string;
+  version: string;
+  links: { docs: string; start: string; manual: string; agents: string | null };
+}
+const { title, description, version, links } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const canonical = new URL(base, site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    {/* The face of the title and of every paragraph, fetched before the stylesheet asks for it. */}
+    <link rel="preload" href={textFont} as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {/* Before the page is drawn: the theme the reader picked here, and a class saying the script runs. */}
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        root.classList.add('js');
+        let choice = '';
+        try {
+          choice = localStorage.getItem('restest-landing-theme') || '';
+        } catch {}
+        root.dataset.theme =
+          choice === 'light' || choice === 'dark'
+            ? choice
+            : matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="nav">
+      <a class="brand" href={base} aria-label="RESTest, the first page">
+        <img class="for-light" src={logo.src} alt="RESTest" width="77" height="34" />
+        <img class="for-dark" src={logoDark.src} alt="RESTest" width="77" height="34" />
+      </a>
+      <nav class="nav-links" aria-label="Site">
+        <a href={links.docs}>Docs</a>
+        <a href={`${repository}/releases`}>Releases</a>
+      </nav>
+      <div class="nav-right">
+        <span class="ver">v{version}</span>
+        <a class="gh" href={repository}><Fragment set:html={githubIcon} /><span>GitHub</span></a>
+        <ThemeSelect storageKey="restest-landing-theme" />
+        <a class="btn" href={links.start}>Get started</a>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="foot-in">
+        <div class="foot-brand">
+          <a class="brand" href={base} aria-label="RESTest, the first page">
+            <img class="for-light" src={logo.src} alt="RESTest" width="127" height="56" />
+            <img class="for-dark" src={logoDark.src} alt="RESTest" width="127" height="56" />
+          </a>
+          <p>Automated testing of REST APIs. Apache-2.0.</p>
+        </div>
+        <div>
+          <b>Documentation</b>
+          <a href={links.manual}>The manual</a>
+          <a href={links.docs}>Reference</a>
+          {links.agents && <a href={links.agents}>For coding agents</a>}
+        </div>
+        <div>
+          <b>Project</b>
+          <a href={repository}>GitHub</a>
+          <a href={`${repository}/releases`}>Releases</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      import { start } from '../components/landing/page';
+      start();
+    </script>
+  </body>
+</html>

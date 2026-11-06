@@ -7,7 +7,8 @@
 // It writes, all of it ignored by git: the pages in src/content/docs/docs/, the images they use in
 // public/source/, the sidebar in src/generated/sidebar.json and public/llms.txt. It fails, naming the
 // file in RESTest, on anything the site cannot be built from: a page with no title, a link to nothing,
-// an index that lists no page.
+// an index that lists no page. When the version keeps the run its manual pictures, it also writes what the
+// first page shows of it, in src/generated/landing-run.json, and the pictures, in src/generated/clinic-run/.
 
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -17,6 +18,7 @@ import { parseArgs } from 'node:util';
 import { base, repository } from '../site.config.mjs';
 import { createResolver } from './lib/links.mjs';
 import { llmsTxt } from './lib/llms.mjs';
+import { landingRun, PICTURES, RUN } from './lib/landing-run.mjs';
 import { DocumentationError } from './lib/markdown.mjs';
 import { addressPages, buildPage } from './lib/pages.mjs';
 import { isRefName, isRelease } from './lib/refs.mjs';
@@ -76,7 +78,16 @@ function main() {
     raw: `${repository.replace('https://github.com/', 'https://raw.githubusercontent.com/')}/${ref}`,
     overviewTitle,
   }));
-  console.log(`Copied ${slugs.size} pages and ${used.size} images of ${describes}${values.from ? `, from ${source}` : ''}`);
+  // The run the first page shows, from a version that keeps one; the first page leaves it out otherwise.
+  const kept = files.has(`${RUN}/report.json`);
+  if (kept) {
+    write(join(generated, 'landing-run.json'), `${JSON.stringify(landingRun(JSON.parse(read(`${RUN}/report.json`))), null, 2)}\n`);
+    for (const picture of PICTURES) {
+      mkdirSync(join(generated, 'clinic-run'), { recursive: true });
+      copyFileSync(plain(`${RUN}/${picture}`), join(generated, 'clinic-run', picture));
+    }
+  }
+  console.log(`Copied ${slugs.size} pages and ${used.size} images of ${describes}${kept ? ', and the run its first page shows' : ''}${values.from ? `, from ${source}` : ''}`);
 }
 
 /** The version the site publishes: the one line of restest-version, which RESTest writes on a release. */

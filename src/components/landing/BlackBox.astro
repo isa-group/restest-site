@@ -1,0 +1,124 @@
+---
+/*
+ * The run, as an animation: RESTest reads the OpenAPI document, sends requests to the API, a black box, and
+ * gets replies back, while the faults it found go by one after another, worded as report.html words them,
+ * above the run's four counts. Everything shown comes from the run whose report the next band pictures.
+ *
+ * The requests move with CSS, so the button in the panel's corner can pause them, and nothing moves for a
+ * reader who asked for less motion. A narrow panel draws the run downwards instead, so that no text is
+ * drawn smaller than the page's smallest.
+ */
+import type { LandingRun } from './run';
+
+interface Props {
+  run: LandingRun;
+}
+const { run } = Astro.props;
+const number = (n: number) => n.toLocaleString('en-US');
+
+// The lanes from RESTest to the API, each with the method of the request it carries and the class of its reply.
+const from = { x: 210, y: 205 };
+const apiLeft = 410;
+const lanes = [
+  { y: 125, method: 'GET', reply: 'c5' },
+  { y: 165, method: 'POST', reply: 'c2' },
+  { y: 205, method: 'GET', reply: 'c4' },
+  { y: 245, method: 'PUT', reply: 'c3' },
+  { y: 285, method: 'DELETE', reply: 'c2' },
+].map((lane, i) => ({ ...lane, width: 24 + 10.8 * lane.method.length, delay: `${i}s` }));
+
+// Each fault shows for its share of the round, fading in and out at the edges of it.
+const slot = 100 / Math.max(run.faults.length, 1);
+const cycle = `@keyframes cycle{0%{opacity:0;transform:translateY(8px)}${(slot * 0.15).toFixed(2)}%,${(slot * 0.9).toFixed(2)}%{opacity:1;transform:none}${(slot * 1.05).toFixed(2)}%,100%{opacity:0;transform:translateY(-4px)}}`;
+---
+
+<div class="panel">
+  <div class="panel-h">
+    <span>Spring PetClinic REST · 1 min</span>
+    <button type="button" class="live" aria-pressed="false" aria-label="Pause the animation">
+      <i aria-hidden="true"></i><span class="when-running">running</span><span class="when-paused">paused</span>
+    </button>
+  </div>
+
+  <svg
+    class="bb"
+    viewBox="0 0 600 340"
+    role="img"
+    aria-label="RESTest reads the OpenAPI document, sends requests made from it to the API, a black box, and checks every reply"
+  >
+    <g class="node">
+      <rect x="20" y="24" width="190" height="70" rx="10"></rect>
+      <text class="t1" x="38" y="55">OpenAPI</text>
+      <text class="t2" x="38" y="81">{run.operations} operations</text>
+    </g>
+    <path class="feed" d="M115 94 V170"></path>
+    <g class="node">
+      <rect x="20" y="170" width="190" height="70" rx="10"></rect>
+      <text class="t1" x="38" y="201">restest run</text>
+      <text class="t2" x="38" y="227">a minute</text>
+    </g>
+    {lanes.map((lane) => <path class="lane" d={`M${from.x} ${from.y} L${apiLeft} ${lane.y}`}></path>)}
+    <g class="api">
+      <rect x={apiLeft} y="90" width="170" height="230" rx="14"></rect>
+      <text class="t1" x="495" y="200">API</text>
+      <text class="t2" x="495" y="232">a black box</text>
+    </g>
+    {
+      lanes.map((lane) => (
+        <>
+          <g
+            class="req"
+            style={`--x0:${from.x + lane.width / 2}px;--y0:${from.y}px;--x1:${apiLeft - lane.width / 2 - 2}px;--y1:${lane.y}px;--delay:${lane.delay}`}
+          >
+            <rect x={-lane.width / 2} y="-14" width={lane.width} height="28" rx="14"></rect>
+            <text x="0" y="6">{lane.method}</text>
+          </g>
+          <circle
+            class={`rep ${lane.reply}`}
+            r="6"
+            style={`--x0:${from.x + 8}px;--y0:${from.y}px;--x1:${apiLeft - 8}px;--y1:${lane.y}px;--delay:${lane.delay}`}
+          ></circle>
+        </>
+      ))
+    }
+  </svg>
+
+  <div class="bb-v" aria-hidden="true">
+    <div class="node"><b>OpenAPI</b><span>{run.operations} operations</span></div>
+    <div class="feed"></div>
+    <div class="node"><b>restest run</b><span>a minute</span></div>
+    <div class="methods">{lanes.map((lane) => <span style={`--delay:${lane.delay}`}>{lane.method}</span>)}</div>
+    <div class="node api"><b>API</b><span>a black box</span></div>
+  </div>
+
+  <style is:inline set:html={cycle}></style>
+  <ol class="faults" style={`--faults:${run.faults.length}`} aria-label="One fault of each kind the run found">
+    {
+      run.faults.map((fault, n) => (
+        <li class={`fault ${fault.severity}`} style={`--n:${n}`}>
+          <div class="f1">
+            <span class="sev">{fault.severity}</span>
+            {fault.title} <span class="code">({fault.code})</span>
+          </div>
+          {fault.path && (
+            <div class="f2">
+              <b>{fault.method}</b> {fault.path} {fault.status !== null && <span class="st">→ {fault.status}</span>}
+            </div>
+          )}
+          <div class="fs">{fault.summary}</div>
+          <div class="f4">{fault.advice}</div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="counts">
+    <div><b>{number(run.requests)}</b>requests sent</div>
+    <div><b class="err">{number(run.errors)}</b>errors, on {run.operationsWithErrors} of {run.operations} operations</div>
+    <div><b class="warn">{number(run.warnings)}</b>warnings, on {run.operationsWithWarnings} of {run.operations} operations</div>
+    <div><b>{run.operations}</b>operations in the document</div>
+  </div>
+</div>
+<p class="note">
+  The run whose report is in the next band: every figure and fault here is in it, worded as it words them.
+</p>

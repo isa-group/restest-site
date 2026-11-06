@@ -5,8 +5,14 @@
  * on a phone, at the foot of the menu.
  *
  * The choice is kept where Starlight keeps it, under `starlight-theme` in the browser's storage, so that
- * Starlight's own script, which runs before the page is drawn, sets the theme without a flash.
+ * Starlight's own script, which runs before the page is drawn, sets the theme without a flash. The first
+ * page, which is no page of Starlight's, keeps its own under another key, given as `storageKey`: each part
+ * of the site keeps the reader's choice apart.
  */
+interface Props {
+  storageKey?: string;
+}
+const { storageKey = 'starlight-theme' } = Astro.props;
 const choices = [
   {
     value: 'auto',
@@ -26,7 +32,7 @@ const choices = [
 ];
 ---
 
-<rt-theme-select>
+<rt-theme-select data-key={storageKey}>
   <div class="theme" role="group" aria-label="Colour theme">
     {
       choices.map(({ value, label, icon }) => (
@@ -41,13 +47,15 @@ const choices = [
 {/* Marks the stored choice before the page is drawn, as Starlight does with its drop-down. */}
 <script is:inline>
   (() => {
-    let choice = '';
-    try {
-      choice = localStorage.getItem('starlight-theme') || '';
-    } catch {}
-    choice = choice === 'light' || choice === 'dark' ? choice : 'auto';
-    document.querySelectorAll('rt-theme-select button').forEach((button) => {
-      button.setAttribute('aria-pressed', String(button.dataset.choice === choice));
+    document.querySelectorAll('rt-theme-select').forEach((picker) => {
+      let choice = '';
+      try {
+        choice = localStorage.getItem(picker.dataset.key) || '';
+      } catch {}
+      choice = choice === 'light' || choice === 'dark' ? choice : 'auto';
+      picker.querySelectorAll('button').forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.choice === choice));
+      });
     });
   })();
 </script>
@@ -55,10 +63,12 @@ const choices = [
 <script>
   type Theme = 'auto' | 'light' | 'dark';
 
-  const storageKey = 'starlight-theme';
   const systemLight = matchMedia('(prefers-color-scheme: light)');
 
   const parse = (value: unknown): Theme => (value === 'light' || value === 'dark' ? value : 'auto');
+
+  /** Where the pickers of this page keep the choice: all of a page's pickers share one key. */
+  const storageKey = document.querySelector<HTMLElement>('rt-theme-select')?.dataset.key ?? 'starlight-theme';
 
   function stored(): Theme {
     try {

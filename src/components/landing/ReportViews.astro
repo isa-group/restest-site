@@ -1,0 +1,66 @@
+---
+/*
+ * report.html of the run, in three views a tab picks: the top of the page, an operation opened at a fault,
+ * and what was found. The pictures are RESTest's own, from its manual, in the theme the reader picked;
+ * without JavaScript, the three are shown one under another.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  title: string | null;
+  pictures: Record<string, ImageMetadata>;
+}
+const { title, pictures } = Astro.props;
+
+const views = [
+  {
+    id: 'summary',
+    name: 'Summary and timeline',
+    alt: 'The top of report.html for the run: four cards counting the replies by class of status code, the errors and the warnings by kind, and the operations by what was found on them, then the timeline of the run',
+  },
+  {
+    id: 'fault',
+    name: 'A fault, in full',
+    alt: 'An operation opened in report.html: how its replies divided, a button for each kind of fault found on it, and the first fault of the first kind written out whole, the request beside the reply',
+  },
+  {
+    id: 'found',
+    name: 'What was found',
+    alt: 'What was found in report.html: each kind of fault, errors first, with what to look at, the classes of status code it came back in, and on how many operations',
+  },
+];
+---
+
+<div class="rp" data-tabs>
+  <div class="tabs rp-tabs" role="tablist" aria-label="Parts of the report">
+    {
+      views.map((view, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`view-${view.id}`}
+          aria-controls={`view-${view.id}-panel`}
+          aria-selected={String(i === 0)}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          {view.name}
+        </button>
+      ))
+    }
+  </div>
+  <div class="rp-win">
+    <div class="rp-bar" aria-hidden="true"><i></i><i></i><i></i><span>report.html{title && ` — ${title}`}</span></div>
+    <div class="rp-views">
+      {
+        views.map((view, i) => (
+          <div role="tabpanel" id={`view-${view.id}-panel`} aria-labelledby={`view-${view.id}`} class={i === 0 ? 'on' : undefined}>
+            <h3>{view.name}</h3>
+            <Image class="for-light" src={pictures[`${view.id}-light`]} alt={view.alt} loading="lazy" />
+            <Image class="for-dark" src={pictures[`${view.id}-dark`]} alt={view.alt} loading="lazy" />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>

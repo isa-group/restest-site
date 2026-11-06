@@ -19,8 +19,6 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'always',
-  // The landing page is not built yet; until it exists, the site opens on the documentation.
-  redirects: { '/': `${base}/docs/` },
   // RESTest's pages are shown as written. Astro's smart punctuation would turn the option `--auth` into
   // `–auth`, and straight quotes into curly ones, which GitHub never does. A Mermaid diagram is drawn, as
   // GitHub draws it, rather than shown as code.
