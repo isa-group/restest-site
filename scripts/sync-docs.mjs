@@ -19,7 +19,7 @@ import { parseArgs } from 'node:util';
 import { base, repository } from '../site.config.mjs';
 import { createResolver } from './lib/links.mjs';
 import { llmsTxt } from './lib/llms.mjs';
-import { landingRun, PICTURES, RUN } from './lib/landing-run.mjs';
+import { AGENTS_PAGE, askingSentence, landingRun, PICTURES, RUN } from './lib/landing-run.mjs';
 import { DocumentationError } from './lib/markdown.mjs';
 import { addressPages, buildPage } from './lib/pages.mjs';
 import { isRefName, isRelease } from './lib/refs.mjs';
@@ -80,11 +80,12 @@ function main() {
     raw: `${repository.replace('https://github.com/', 'https://raw.githubusercontent.com/')}/${ref}`,
     overviewTitle,
   }));
-  // What the first page shows: the version the site publishes, which its Docker command installs, and the run
-  // of a version that keeps one, or null.
+  // What the first page shows: the version the site publishes, which its Docker command installs; the run of a
+  // version that keeps one; and what the page for coding agents tells a person to give their agent; or null.
   const kept = files.has(`${RUN}/report.json`);
   const run = kept ? landingRun(JSON.parse(read(`${RUN}/report.json`))) : null;
-  write(join(generated, 'landing.json'), `${JSON.stringify({ version: published.slice(1), run }, null, 2)}\n`);
+  const prompt = files.has(AGENTS_PAGE) ? askingSentence(read(AGENTS_PAGE)) : null;
+  write(join(generated, 'landing.json'), `${JSON.stringify({ version: published.slice(1), prompt, run }, null, 2)}\n`);
   if (kept) {
     mkdirSync(join(generated, 'clinic-run'), { recursive: true });
     for (const picture of PICTURES) copyFileSync(plain(`${RUN}/${picture}`), join(generated, 'clinic-run', picture));

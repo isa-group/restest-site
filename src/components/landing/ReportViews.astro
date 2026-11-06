@@ -4,9 +4,10 @@
  * and what was found. The pictures are RESTest's own, from its manual, in the theme the reader picked,
  * taken at twice the page's resolution so that their text stays sharp on any screen; the browser fetches
  * the size the screen needs, and only for the view shown. The frame keeps the height of the tallest, so that
- * picking a tab moves nothing below it. Without JavaScript, the three are shown one under another.
+ * picking a tab moves nothing below it. A picture opens at its full size, which on a phone is the only way
+ * to read it. Without JavaScript, the three are shown one under another.
  */
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { tab, panel } from './tabs';
 
@@ -34,6 +35,12 @@ const views = [
   },
 ];
 const tallest = Object.values(pictures).reduce((a, b) => (b.height / b.width > a.height / a.width ? b : a));
+const picture = { width: 2160, quality: 90 };
+const fullSize = Object.fromEntries(
+  await Promise.all(
+    Object.entries(pictures).map(async ([name, src]) => [name, (await getImage({ src, ...picture })).src]),
+  ),
+);
 ---
 
 <div class="rp" data-tabs>
@@ -48,16 +55,16 @@ const tallest = Object.values(pictures).reduce((a, b) => (b.height / b.width > a
           <div {...panel('view', view.id, i === 0)}>
             <h3>{view.name}</h3>
             {['light', 'dark'].map((theme) => (
-              <Image
-                class={`for-${theme}`}
-                src={pictures[`${view.id}-${theme}`]}
-                alt={view.alt}
-                width={2160}
-                widths={[1080, 2160]}
-                sizes="(min-width: 1112px) 1078px, calc(100vw - 34px)"
-                quality={90}
-                loading="lazy"
-              />
+              <a class={`for-${theme}`} href={fullSize[`${view.id}-${theme}`]} title="Open at full size">
+                <Image
+                  src={pictures[`${view.id}-${theme}`]}
+                  alt={view.alt}
+                  {...picture}
+                  widths={[1080, 2160]}
+                  sizes="(min-width: 1112px) 1078px, calc(100vw - 34px)"
+                  loading="lazy"
+                />
+              </a>
             ))}
           </div>
         ))

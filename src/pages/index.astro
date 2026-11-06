@@ -17,12 +17,11 @@ import BlackBox from '../components/landing/BlackBox.astro';
 import Install from '../components/landing/Install.astro';
 import ReportViews from '../components/landing/ReportViews.astro';
 import { arrowIcon, githubIcon } from '../components/landing/icons';
-import { agentPrompt } from '../components/landing/prompt';
 import { minutesInWords, type Landing as LandingData } from '../components/landing/run';
 import landing from '../generated/landing.json';
-import { repository, site } from '../../site.config.mjs';
+import { repository } from '../../site.config.mjs';
 
-const { version, run } = landing as LandingData;
+const { version, run, prompt: sentence } = landing as LandingData;
 const base = import.meta.env.BASE_URL;
 
 const pages = new Set((await getCollection('docs')).map((page) => page.id));
@@ -41,7 +40,8 @@ const links = {
   settings: page('docs/manual/settings'),
 };
 
-const prompt = links.agents && agentPrompt(new URL(links.agents, site).href);
+// The sentence RESTest's page for coding agents tells a person to give their agent, there from 2.5.0 on.
+const prompt = links.agents && sentence;
 const pictures = Object.fromEntries(
   Object.entries(
     import.meta.glob<ImageMetadata>('../generated/clinic-run/*.png', { eager: true, import: 'default' }),

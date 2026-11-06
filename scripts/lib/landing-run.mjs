@@ -1,4 +1,7 @@
-// The run RESTest's manual keeps, as the site's first page shows it: its figures, and one fault of each kind.
+// What the site's first page takes from RESTest's documentation: the run its manual keeps, its figures and
+// one fault of each kind, and the sentence its page for coding agents tells a person to give their agent.
+
+import { parse, plainText } from './markdown.mjs';
 
 /** Where RESTest keeps the run: its report.json, and pictures of its report.html. */
 export const RUN = 'docs/manual/images/clinic-run';
@@ -48,6 +51,24 @@ export function landingRun(report) {
     operationsWithWarnings: totals.operationsWithWarnings ?? 0,
     faults,
   };
+}
+
+/** RESTest's page for coding agents, which RESTest has from 2.5.0 on. */
+export const AGENTS_PAGE = 'docs/for-coding-agents.md';
+
+/**
+ * What a person is told to give their coding agent: the first block of code under the heading "Asking your
+ * agent" of RESTest's page for coding agents, which RESTest holds its README to; null when there is none.
+ */
+export function askingSentence(markdown) {
+  const nodes = parse(markdown).children;
+  const at = nodes.findIndex((node) => node.type === 'heading' && plainText(node) === 'Asking your agent');
+  if (at < 0) return null;
+  for (const node of nodes.slice(at + 1)) {
+    if (node.type === 'heading') return null;
+    if (node.type === 'code') return node.value.trim() || null;
+  }
+  return null;
 }
 
 const rank = (kind) => (kind.severity === 'error' ? 0 : 1);

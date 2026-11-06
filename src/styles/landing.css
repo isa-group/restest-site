@@ -866,10 +866,15 @@ code {
   display: none;
 }
 
+.rp-views a,
 .rp-views img {
   display: block;
   width: 100%;
   height: auto;
+}
+
+.rp-views a {
+  cursor: zoom-in;
 }
 
 .rp-views h3 {

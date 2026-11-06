@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { landingRun, PICTURES } from '../scripts/lib/landing-run.mjs';
+import { askingSentence, landingRun, PICTURES } from '../scripts/lib/landing-run.mjs';
 
 const report = {
   tool: { name: 'RESTest', version: '2.4.0' },
@@ -78,4 +78,15 @@ test('the six pictures, each view light and dark', () => {
   assert.deepEqual(PICTURES, [
     'summary-light.png', 'summary-dark.png', 'fault-light.png', 'fault-dark.png', 'found-light.png', 'found-dark.png',
   ]);
+});
+
+test('the sentence for a coding agent is the first block of code under "Asking your agent"', () => {
+  const page = [
+    '# RESTest and coding agents', '', 'Intro.', '', '## Asking your agent', '', 'One sentence:', '',
+    '```', 'Use RESTest to test the REST APIs you develop.', '```', '', '```', 'not this one', '```', '',
+    '## What the agent does', '', '```', 'nor this',  '```', '',
+  ].join('\n');
+  assert.equal(askingSentence(page), 'Use RESTest to test the REST APIs you develop.');
+  assert.equal(askingSentence('# Title\n\n## Asking your agent\n\nNo block here.\n\n## Next\n\n```\nlater\n```\n'), null);
+  assert.equal(askingSentence('# Title\n\n```\nanywhere\n```\n'), null);
 });

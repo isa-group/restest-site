@@ -23,9 +23,11 @@ export interface LandingRun {
   faults: LandingFault[];
 }
 
-/** What scripts/sync-docs.mjs writes for the first page: the version the site publishes, and the run. */
+/** What scripts/sync-docs.mjs writes for the first page: the version the site publishes, the sentence for a
+ * coding agent, and the run. */
 export interface Landing {
   version: string;
+  prompt: string | null;
   run: LandingRun | null;
 }
 

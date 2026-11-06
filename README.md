@@ -93,14 +93,15 @@ look, from the same tokens.
   the first band shows those, and the second band the pictures, in the theme the reader picked and in
   two sizes, for ordinary and sharp screens. A version that keeps no run, such as 2.4.0, has a first
   page without those two bands.
-- **The band for coding agents** and the first way to start link RESTest's page for them, which RESTest
-  has from 2.5.0 on; a version without it has a first page without either. The prompt it gives, in
-  [`src/components/landing/prompt.ts`](src/components/landing/prompt.ts), is the one RESTest's README
-  and that page give.
+- **The band for coding agents** and the first way to start give the sentence RESTest's page for coding
+  agents tells a person to give their agent, the first block of code under "Asking your agent", which
+  `scripts/sync-docs.mjs` reads at that version and RESTest holds its README to. RESTest has that page
+  from 2.5.0 on; a version without it has a first page without either.
 - **Every link to a page of the documentation** is looked up among the pages built, and the build
   stops if one is not there, naming it: the first page links chapters of the manual by name.
 - **Without JavaScript**, everything shows: the four commands one under another, the faults as a list
-  and the three views of the report. With less motion asked for, nothing moves; the animation's
+  and the three views of the report, in the system's theme; what needs the script, such as "Copy", is not
+  drawn. A picture of the report opens at full size, to be read on a phone. With less motion asked for, nothing moves; the animation's
   button pauses it otherwise.
 - **The theme** is picked with the same three buttons as the documentation, and kept apart from it,
   under `restest-landing-theme`.
