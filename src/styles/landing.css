@@ -1025,8 +1025,7 @@ code {
 }
 
 .band.contact p a,
-.rp-cap a,
-.foot-brand p a {
+.rp-cap a {
   color: var(--rt-accent-text);
   text-decoration: underline;
   text-decoration-thickness: 1px;
