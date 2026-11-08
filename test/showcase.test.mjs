@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -9,6 +9,7 @@ import {
   campaignTotals,
   campaigns,
   checkManifest,
+  localCampaign,
   mostErrors,
   ShowcaseError,
 } from '../scripts/lib/showcase.mjs';
@@ -35,7 +36,7 @@ test('a manifest of another format, another version or an unsafe name stops the 
   const manifest = { format: 1, restest: { version: '2.5.0' }, apis: [{ id: 'petclinic-rest' }] };
   checkManifest('showcase-v2.5.0', manifest);
 
-  assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, format: 2 }), /showcase-v2\.5\.0: .*format 2/);
+  assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, format: 2 }), /^ShowcaseError: showcase-v2\.5\.0: .*format 2/);
   assert.throws(() => checkManifest('showcase-v2.6.0', manifest), /campaign of RESTest 2\.5\.0/);
   assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, apis: [{ id: '../index' }] }), ShowcaseError);
   assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, apis: undefined }), /lists no APIs/);
@@ -86,7 +87,7 @@ test("a campaign's figures, and its APIs with the most errors", () => {
   ];
 
   assert.deepEqual(campaignTotals(rows), { apis: 4, requests: 60, errors: 14, warnings: 6, apisWithErrors: 2 });
-  assert.deepEqual(mostErrors(rows, 5).map((row) => row.id), ['c', 'a']);
+  assert.deepEqual(mostErrors(rows).map((row) => row.id), ['c', 'a']);
 });
 
 test('a budget in words, as both bands of the first page say it', () => {
@@ -116,7 +117,7 @@ function campaignFolder(root, version, apis) {
     format: 1, restest: { version }, budget: 'PT15M', startedAt: '2026-11-20T10:00:00Z',
     runner: { label: 'ubuntu-24.04', cpus: 4, memoryGiB: 16, freeDiskGiB: 80 }, apis: entries,
   }));
-  return { tag: `showcase-v${version}`, file: (name) => (existsSync(join(folder, name)) ? join(folder, name) : null) };
+  return localCampaign(folder);
 }
 
 test("the newest campaign's reports are served by the site, and an older one's rows link to its release", async () => {
@@ -133,18 +134,25 @@ test("the newest campaign's reports are served by the site, and an older one's r
     assert.deepEqual(built.map((campaign) => campaign.version), ['2.6.0', '2.5.0']);
     const [newest, older] = built;
     assert.equal(newest.minutes, 15);
-    assert.equal(newest.release, 'https://github.com/isa-group/restest-dataset/releases/tag/showcase-v2.6.0');
     assert.deepEqual(newest.totals, { apis: 3, requests: 2400, errors: 60, warnings: 800, apisWithErrors: 2 });
-    assert.deepEqual(newest.apis.map((api) => api.page), [
-      { href: 'showcase/2.6.0/clinic.html', here: true }, null, null,
-    ]);
+    assert.deepEqual(newest.apis.map((api) => api.page), ['showcase/2.6.0/clinic.html', null, null]);
     assert.equal(newest.apis[1].outcome, 'apiDidNotStart');
     assert.equal(newest.apis[2].errors, 30);
-    assert.deepEqual(older.apis[0].page, {
-      href: 'https://github.com/isa-group/restest-dataset/releases/download/showcase-v2.5.0/clinic.report.html', here: false,
-    });
+    assert.equal(older.apis[0].page, 'https://github.com/isa-group/restest-dataset/releases/download/showcase-v2.5.0/clinic.report.html');
+    assert.deepEqual(newest.mostErrors.map((row) => row.id), ['bare', 'clinic']);
     assert.deepEqual(readdirSync(publicDir), ['2.6.0']);
     assert.deepEqual(readdirSync(join(publicDir, '2.6.0')), ['clinic.html']);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a folder without a manifest, or whose manifest names no version, is no campaign', () => {
+  const root = mkdtempSync(join(tmpdir(), 'showcase-'));
+  try {
+    assert.throws(() => localCampaign(root), /holds no manifest\.json/);
+    writeFileSync(join(root, 'manifest.json'), JSON.stringify({ format: 1, restest: { version: 'master' } }));
+    assert.throws(() => localCampaign(root), /names no version/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

@@ -1,102 +1,17 @@
 /*
- * The showcase, and the first page's band "On real APIs", as the site's mock-up draws them, on the site's
- * tokens. Figures of errors and warnings are in their colours, as tokens.css allows; the bar's colours are
- * marks, each also said in words.
+ * The showcase's page, as the site's mock-up draws it, on the site's tokens. What its table shares with the
+ * first page's band "On real APIs", and the colours of errors and warnings, are in landing.css. The bar's
+ * colours are marks, each also said in words.
  */
 
-/* The band on the first page: four figures, and the APIs with the most errors. */
-.real-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--rt-line);
-  border: 1px solid var(--rt-line);
-  border-radius: var(--rt-radius-card);
-  overflow: hidden;
-  margin-bottom: 18px;
-}
-
-.real-stats div {
-  background: var(--rt-surface);
-  padding: 18px 20px;
-  font-size: var(--rt-text-min);
-  color: var(--rt-text-3);
-}
-
-.real-stats b {
-  display: block;
-  font: 600 30px/1.15 var(--rt-font-num);
-  letter-spacing: -0.02em;
-  color: var(--rt-text);
-  font-variant-numeric: tabular-nums;
-}
-
-:is(.real-stats, .sc-stats) b.err,
-:is(.mini, .sc-table) td.err {
-  color: var(--rt-error);
-}
-
-:is(.real-stats, .sc-stats) b.warn,
-:is(.mini, .sc-table) td.warn {
-  color: var(--rt-warning);
-}
-
-.mini {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 15px;
-  background: var(--rt-surface);
-  border: 1px solid var(--rt-line);
-  border-radius: var(--rt-radius-card);
-  overflow: hidden;
-}
-
-.mini th {
-  text-align: left;
-  font-size: var(--rt-text-min);
-  font-weight: 600;
-  color: var(--rt-text-2);
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--rt-line);
-}
-
-.mini td,
-.mini tbody th {
-  padding: 10px 16px;
-  border-top: 1px solid var(--rt-line-faint);
-  border-bottom: 0;
-}
-
-.mini tbody tr:first-child :is(td, th) {
-  border-top: 0;
-}
-
-:is(.mini, .sc-table) .api {
-  font: 400 var(--rt-text-min) var(--rt-font-mono);
-  color: var(--rt-text);
-  text-align: left;
-}
-
-:is(.mini, .sc-table) .num {
-  text-align: right;
-  font-family: var(--rt-font-num);
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-}
-
-/* The showcase's page. */
 .sc {
   max-width: 1180px;
   margin: 0 auto;
   padding: 56px 40px 72px;
 }
 
-.sc .eyebrow {
-  font: 500 var(--rt-text-min) / 1 var(--rt-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--rt-accent-text);
+.sc-head .kicker {
+  margin-bottom: 0;
 }
 
 .sc-head h1 {
@@ -120,31 +35,27 @@
   margin: 28px 0 14px;
 }
 
-.sc .select,
-.sc .filter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  padding: 0 12px;
+/* The campaign picker, a list of links that opens without the script, and the filter. */
+.sc :is(.select, .filter) {
   border: 1px solid var(--rt-line);
   border-radius: var(--rt-radius);
   background: var(--rt-surface);
   font-size: var(--rt-text-min);
 }
 
-.sc details.select {
-  position: relative;
-  display: block;
-  padding: 0;
-}
-
-.sc details.select summary {
+.sc :is(div.select, details.select summary, .filter) {
   display: flex;
   align-items: center;
   gap: 10px;
   min-height: 40px;
   padding: 0 12px;
+}
+
+.sc details.select {
+  position: relative;
+}
+
+.sc details.select summary {
   cursor: pointer;
 }
 
@@ -194,10 +105,6 @@
   background: transparent;
   color: var(--rt-text);
   font: inherit;
-}
-
-:root:not(.js) .sc .filter {
-  display: none;
 }
 
 .legend {
@@ -264,21 +171,7 @@
 }
 
 .sc-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--rt-surface);
-  text-align: left;
-  font-size: var(--rt-text-min);
-  font-weight: 600;
-  color: var(--rt-text-2);
   padding: 11px 14px;
-  border-bottom: 1px solid var(--rt-line);
-  white-space: nowrap;
-}
-
-.sc-table thead th.num {
-  text-align: right;
 }
 
 .sc-table tbody :is(td, th) {
@@ -286,10 +179,6 @@
   height: 44px;
   border-top: 1px solid var(--rt-line-faint);
   font-size: 15px;
-}
-
-.sc-table tbody tr:first-child :is(td, th) {
-  border-top: 0;
 }
 
 .sc-table tbody tr:hover {
@@ -300,13 +189,9 @@
   display: none;
 }
 
-.sc-table td.zero {
+.sc-table td:is(.zero, .outcome) {
   color: var(--rt-text-3);
   font-weight: 400;
-}
-
-.sc-table td.outcome {
-  color: var(--rt-text-3);
 }
 
 .opsbar {
@@ -359,15 +244,6 @@
   white-space: nowrap;
 }
 
-.sc-table td.rep a {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--rt-accent-text);
-  font-weight: 500;
-  font-size: var(--rt-text-min);
-}
-
 .sc-none {
   margin: 0;
   padding: 16px;
@@ -380,13 +256,6 @@
   font-size: var(--rt-text-min);
   line-height: 1.6;
   color: var(--rt-text-3);
-}
-
-.sc-lead a,
-.sc-foot a {
-  color: var(--rt-accent-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 @media (max-width: 1100px) {
@@ -448,13 +317,5 @@
 
   .bar-n {
     width: auto;
-  }
-
-  .real-stats b {
-    font-size: 22px;
-  }
-
-  .mini :is(th, td):nth-child(2) {
-    display: none;
   }
 }

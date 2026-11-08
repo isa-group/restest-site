@@ -8,7 +8,6 @@
 import ThemeSelect from '../components/ThemeSelect.astro';
 import { githubIcon } from '../components/landing/icons';
 import type { SiteLinks } from '../components/landing/links';
-import { campaigns } from '../components/showcase/data';
 import logo from '../assets/logo.svg';
 import logoDark from '../assets/logo-dark.svg';
 import textFont from '../assets/fonts/space-grotesk-latin-wght-normal.woff2?url';
@@ -21,15 +20,12 @@ interface Props {
   description: string;
   version: string;
   links: SiteLinks;
-  /** The page's address under the site's, such as showcase/; the first page's is empty. */
-  path?: string;
   /** Where the page keeps the reader's choice of theme, apart from the rest of the site's. */
   themeKey?: string;
 }
-const { title, description, version, links, path = '', themeKey = 'restest-landing-theme' } = Astro.props;
+const { title, description, version, links, themeKey = 'restest-landing-theme' } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const canonical = new URL(base + path, site).href;
-const showcase = campaigns.length > 0 ? `${base}showcase/` : null;
+const canonical = new URL(Astro.url.pathname, site).href;
 ---
 
 <!doctype html>
@@ -73,7 +69,7 @@ const showcase = campaigns.length > 0 ? `${base}showcase/` : null;
       </a>
       <nav class="nav-links" aria-label="Site">
         <a href={links.docs}>Docs</a>
-        {showcase && <a href={showcase}>Showcase</a>}
+        {links.showcase && <a href={links.showcase}>Showcase</a>}
         <a href={`${repository}/releases`}>Releases</a>
       </nav>
       <div class="nav-right">
@@ -107,7 +103,7 @@ const showcase = campaigns.length > 0 ? `${base}showcase/` : null;
           <b>Project</b>
           <a href={repository}>GitHub</a>
           <a href={`${repository}/releases`}>Releases</a>
-          {showcase && <a href={showcase}>Showcase</a>}
+          {links.showcase && <a href={links.showcase}>Showcase</a>}
         </div>
       </div>
     </footer>

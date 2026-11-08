@@ -4,12 +4,10 @@
  * Starlight's own link to RESTest on GitHub.
  */
 import Default from '@astrojs/starlight/components/SocialIcons.astro';
-import { campaigns } from './showcase/data';
-
-const showcase = campaigns.length > 0 ? `${import.meta.env.BASE_URL}showcase/` : null;
+import { showcaseHome } from './showcase/data';
 ---
 
-{showcase && <a class="rt-showcase" href={showcase}>Showcase</a>}
+{showcaseHome && <a class="rt-showcase" href={showcaseHome}>Showcase</a>}
 <Default {...Astro.props} />
 
 <style>

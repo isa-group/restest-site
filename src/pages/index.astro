@@ -19,15 +19,14 @@ import { arrowIcon, githubIcon } from '../components/landing/icons';
 import { minutesInWords, type Landing as LandingData } from '../components/landing/run';
 import landing from '../generated/landing.json';
 import { siteLinks } from '../components/landing/links';
-import { number } from '../components/landing/format';
+import ShowcaseBand from '../components/showcase/ShowcaseBand.astro';
 import { campaigns } from '../components/showcase/data';
-import '../styles/showcase.css';
 import { repository } from '../../site.config.mjs';
 
 const { version, run, prompt: sentence } = landing as LandingData;
 const base = import.meta.env.BASE_URL;
 
-const links = await siteLinks('The first page');
+const links = await siteLinks();
 
 // The sentence RESTest's page for coding agents tells a person to give their agent, there from 2.5.0 on.
 const prompt = links.agents && sentence;
@@ -39,7 +38,6 @@ const pictures = Object.fromEntries(
 
 // The newest campaign of the showcase, when one is published, for the band "On real APIs".
 const campaign = campaigns[0];
-const worst = campaign ? campaign.mostErrors.map((id) => campaign.apis.find((api) => api.id === id)!) : [];
 
 // The bands are numbered as they come, and their backgrounds alternate, since three of them may be missing.
 const shown = [
@@ -50,9 +48,15 @@ const shown = [
   'Shaping a run',
   'About us',
 ].filter((name): name is string => Boolean(name));
-const kicker = (name: string) => `${String(shown.indexOf(name) + 1).padStart(2, '0')} · ${name}`;
+/** Where a band comes; the build stops if a band of the page is missing from the list above. */
+const place = (name: string) => {
+  const at = shown.indexOf(name);
+  if (at < 0) throw new Error(`The first page draws a band "${name}" that is not in its list of bands`);
+  return at;
+};
+const kicker = (name: string) => `${String(place(name) + 1).padStart(2, '0')} · ${name}`;
 /** A band's class: its background alternates with the band before it. The last band, "About us", has its own. */
-const band = (name: string) => (shown.indexOf(name) % 2 ? 'band alt' : 'band');
+const band = (name: string) => (place(name) % 2 ? 'band alt' : 'band');
 ---
 
 <Landing
@@ -125,44 +129,7 @@ const band = (name: string) => (shown.indexOf(name) % 2 ? 'band alt' : 'band');
     )
   }
 
-  {campaign && (
-  <section class={band('On real APIs')}>
-    <div class="band-in two reveal">
-      <div class="band-copy">
-        <div class="kicker">{kicker('On real APIs')}</div>
-        <h2>{campaign.totals.apis} APIs, <span class="second">{minutesInWords(campaign.minutes)} each.</span></h2>
-        <p>
-          The APIs of the <a href="https://github.com/WebFuzzing/Dataset">Web Fuzzing Dataset</a>, each started on its
-          own and tested by RESTest {campaign.version}. Every row of the showcase opens that run's report.
-        </p>
-        <a class="btn ghost" href={`${base}showcase/`}>See the showcase <Fragment set:html={arrowIcon} /></a>
-      </div>
-      <div class="real">
-        <div class="real-stats">
-          <div><b>{number(campaign.totals.requests)}</b>requests</div>
-          <div><b class="err">{number(campaign.totals.errors)}</b>errors</div>
-          <div><b class="warn">{number(campaign.totals.warnings)}</b>warnings</div>
-          <div><b>{campaign.totals.apisWithErrors} of {campaign.totals.apis}</b>APIs with an error</div>
-        </div>
-        <table class="mini">
-          <thead>
-            <tr><th scope="col">Most errors</th><th scope="col" class="num">Requests</th><th scope="col" class="num">Errors</th><th scope="col" class="num">Warnings</th></tr>
-          </thead>
-          <tbody>
-            {worst.map((api) => (
-              <tr>
-                <th scope="row" class="api">{api.id}</th>
-                <td class="num">{number(api.requests ?? 0)}</td>
-                <td class="num err">{number(api.errors ?? 0)}</td>
-                <td class="num warn">{number(api.warnings ?? 0)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-  )}
+  {campaign && <ShowcaseBand campaign={campaign} class={band('On real APIs')} kicker={kicker('On real APIs')} />}
 
   {prompt && (
   <section class={band('For coding agents')}>

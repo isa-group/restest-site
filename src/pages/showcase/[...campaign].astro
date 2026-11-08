@@ -27,12 +27,13 @@ export function getStaticPaths() {
 const { campaign } = Astro.props as { campaign: Campaign };
 const { version } = landing as LandingData;
 const base = import.meta.env.BASE_URL;
-const links = await siteLinks('The showcase');
+const links = await siteLinks();
 const totals = campaign.totals;
 const each = minutesInWords(campaign.minutes);
 const newest = campaign === campaigns[0];
 const runner = campaign.runner;
-const share = (part: number | undefined, whole: number | undefined) => (whole ? ((part ?? 0) / whole) * 100 : 0);
+/** How the picker names a campaign. */
+const label = (c: Campaign) => `RESTest ${c.version} · ${day(c.date)}`;
 ---
 
 <Landing
@@ -40,12 +41,11 @@ const share = (part: number | undefined, whole: number | undefined) => (whole ? 
   description={`What RESTest ${campaign.version} found on ${totals.apis} REST APIs of the Web Fuzzing Dataset, each tested for ${each}: every API's figures, and its report.`}
   version={version}
   links={links}
-  path={showcasePath(campaign)}
   themeKey="restest-showcase-theme"
 >
   <div class="sc">
     <div class="sc-head">
-      <div class="eyebrow">Showcase</div>
+      <div class="kicker">Showcase</div>
       <h1>RESTest on {totals.apis} real APIs</h1>
       <p class="sc-lead">
         REST APIs from the <a href="https://github.com/WebFuzzing/Dataset">Web Fuzzing Dataset</a>, each started on its
@@ -60,13 +60,13 @@ const share = (part: number | undefined, whole: number | undefined) => (whole ? 
           <details class="select">
             <summary>
               <span class="sel-l">Campaign</span>
-              <span class="sel-v">RESTest {campaign.version} · {day(campaign.date)}</span>
+              <span class="sel-v">{label(campaign)}</span>
             </summary>
             <ul>
               {campaigns.map((other) => (
                 <li>
                   <a href={`${base}${showcasePath(other)}`} aria-current={other === campaign ? 'page' : undefined}>
-                    RESTest {other.version} · {day(other.date)}
+                    {label(other)}
                   </a>
                 </li>
               ))}
@@ -75,7 +75,7 @@ const share = (part: number | undefined, whole: number | undefined) => (whole ? 
         ) : (
           <div class="select">
             <span class="sel-l">Campaign</span>
-            <span class="sel-v">RESTest {campaign.version} · {day(campaign.date)}</span>
+            <span class="sel-v">{label(campaign)}</span>
           </div>
         )
       }
@@ -124,10 +124,10 @@ const share = (part: number | undefined, whole: number | undefined) => (whole ? 
                     <td class:list={['num hide-s', api.warnings ? 'warn' : 'zero']}>{number(api.warnings ?? 0)}</td>
                     <td class="opsbar" title={told}>
                       <div class="bar" aria-hidden="true">
-                        <span class="b-e" style={`flex-grow:${share(api.withErrors, api.operations)}`} />
-                        <span class="b-w" style={`flex-grow:${share(api.onlyWarnings, api.operations)}`} />
-                        <span class="b-k" style={`flex-grow:${share(api.nothing, api.operations)}`} />
-                        <span class="b-x" style={`flex-grow:${share(api.notTested, api.operations)}`} />
+                        <span class="b-e" style={`flex-grow:${api.withErrors}`} />
+                        <span class="b-w" style={`flex-grow:${api.onlyWarnings}`} />
+                        <span class="b-k" style={`flex-grow:${api.nothing}`} />
+                        <span class="b-x" style={`flex-grow:${api.notTested}`} />
                       </div>
                       <span class="bar-n" aria-hidden="true">{api.withErrors}/{api.operations}</span>
                       <span class="sr">{told}, of {api.operations} operations</span>
@@ -138,8 +138,8 @@ const share = (part: number | undefined, whole: number | undefined) => (whole ? 
                 )}
                 <td class="rep">
                   {api.page && (
-                    <a href={api.page.here ? `${base}${api.page.href}` : api.page.href}>
-                      {api.page.here ? 'report' : 'download'} <Fragment set:html={arrowIcon} />
+                    <a class="arrow-link" href={newest ? `${base}${api.page}` : api.page}>
+                      {newest ? 'report' : 'download'} <Fragment set:html={arrowIcon} />
                       <span class="sr"> of {api.id}</span>
                     </a>
                   )}

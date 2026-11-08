@@ -8,37 +8,32 @@
 // It writes, all of it ignored by git, src/generated/showcase.json, what the showcase and the first page's
 // band show, and the newest campaign's report.html files in public/showcase/<version>/. A release's files
 // are kept in .restest/showcase/ between runs, each under the id GitHub gives it, so that a file replaced in
-// a release is fetched again. It fails, naming the release and the file, on anything the site cannot be built
-// from. GITHUB_TOKEN, when set, is sent to GitHub's API alone, to list the releases.
+// a release is fetched again; a few are fetched at once. It fails, naming the release and the file, on
+// anything the site cannot be built from. GITHUB_TOKEN, when set, is sent to GitHub's API alone, to list the
+// releases.
 
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { existsSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { buildShowcase, campaigns, DATASET, isCampaignTag, newerFirst, ShowcaseError } from './lib/showcase.mjs';
+import { write } from './lib/files.mjs';
+import { buildShowcase, campaigns, DATASET, localCampaign, newerFirst, ShowcaseError } from './lib/showcase.mjs';
 
 const site = fileURLToPath(new URL('..', import.meta.url));
 const TRIES = 3;
+const AT_ONCE = 6;
 
 async function main() {
   const { values } = parseArgs({ options: { from: { type: 'string', multiple: true } } });
-  const sources = values.from ? values.from.map(local).sort((a, b) => newerFirst(a.tag, b.tag)) : await published();
+  const sources = values.from
+    ? values.from.map(localCampaign).sort((a, b) => newerFirst(a.tag, b.tag))
+    : await published();
   const publicDir = join(site, 'public/showcase');
   rmSync(publicDir, { recursive: true, force: true });
   const showcase = await buildShowcase(sources, { publicDir });
   write(join(site, 'src/generated/showcase.json'), `${JSON.stringify(showcase, null, 2)}\n`);
   const said = showcase.campaigns.map((c, i) => `${c.version} (${c.apis.length} APIs${i === 0 ? ', their reports served' : ''})`);
   console.log(said.length ? `Read the showcase's campaigns: ${said.join(', ')}` : 'No campaign is published yet');
-}
-
-/** A campaign in a folder on this machine, its tag read from its manifest. */
-function local(folder) {
-  const dir = resolve(folder);
-  const manifest = join(dir, 'manifest.json');
-  if (!existsSync(manifest)) throw new ShowcaseError(`${folder} holds no manifest.json`);
-  const tag = `showcase-v${JSON.parse(readFileSync(manifest, 'utf8')).restest?.version}`;
-  if (!isCampaignTag(tag)) throw new ShowcaseError(`${folder}: manifest.json names no version such as 2.5.0`);
-  return { tag, file: (name) => (existsSync(join(dir, name)) ? join(dir, name) : null) };
 }
 
 /** The published campaigns, newest first, each fetching a file of its release only when it is asked for. */
@@ -57,7 +52,8 @@ async function published() {
         const asset = assets.get(name);
         if (!asset) return null;
         const kept = join(site, '.restest/showcase', release.tag_name, `${asset.id}-${name}`);
-        if (!existsSync(kept)) write(kept, await download(asset.browser_download_url));
+        // A release's file is public: no token is sent with it.
+        if (!existsSync(kept)) write(kept, await atMostSixAtOnce(() => fetchTrying(asset.browser_download_url, {})));
         return kept;
       },
     };
@@ -71,15 +67,26 @@ async function json(url) {
   return JSON.parse((await fetchTrying(url, headers)).toString('utf8'));
 }
 
-/** A release's file, from its public address: no token is sent with it. */
-function download(url) {
-  return fetchTrying(url, {});
+let running = 0;
+const waiting = [];
+
+/** Runs a download once fewer than six are running. */
+async function atMostSixAtOnce(task) {
+  while (running >= AT_ONCE) await new Promise((go) => waiting.push(go));
+  running++;
+  try {
+    return await task();
+  } finally {
+    running--;
+    waiting.shift()?.();
+  }
 }
 
-/** The body of a GET, tried three times, a second apart, before the build stops naming the address. */
+/** The body of a GET, tried three times, a second and then two apart, before the build stops naming the address. */
 async function fetchTrying(url, headers) {
   let last;
   for (let attempt = 1; attempt <= TRIES; attempt++) {
+    if (attempt > 1) await new Promise((done) => setTimeout(done, 1000 * (attempt - 1)));
     try {
       const reply = await fetch(url, { headers });
       if (reply.ok) return Buffer.from(await reply.arrayBuffer());
@@ -88,14 +95,8 @@ async function fetchTrying(url, headers) {
     } catch (error) {
       last = error.message;
     }
-    await new Promise((done) => setTimeout(done, 1000 * attempt));
   }
-  throw new ShowcaseError(`${url.replace(/\?.*/, '')} ${last}`);
-}
-
-function write(file, data) {
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, data);
+  throw new ShowcaseError(url.replace(/\?.*/, ''), last);
 }
 
 try {

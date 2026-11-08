@@ -16,19 +16,18 @@ export interface ShowcaseRow {
   onlyWarnings?: number;
   nothing?: number;
   notTested?: number;
-  /** Its report.html: served by the site for the newest campaign, else downloaded from the release. */
-  page: { href: string; here: boolean } | null;
+  /** Its report.html: under the site's address for the newest campaign, else its download from the release. */
+  page: string | null;
 }
 
 export interface Campaign {
   version: string;
-  release: string;
   date: string;
   minutes: number | null;
   runner: { label: string; cpus: number; memoryGiB: number | null } | null;
   apis: ShowcaseRow[];
   totals: { apis: number; requests: number; errors: number; warnings: number; apisWithErrors: number };
-  mostErrors: string[];
+  mostErrors: ShowcaseRow[];
 }
 
 const written = import.meta.glob<{ campaigns: Campaign[] }>('../../generated/showcase.json', {
@@ -38,6 +37,9 @@ const written = import.meta.glob<{ campaigns: Campaign[] }>('../../generated/sho
 
 /** The published campaigns, the newest first; none when the build did not read them. */
 export const campaigns: Campaign[] = Object.values(written)[0]?.campaigns ?? [];
+
+/** The showcase's address, when a campaign is published, for the links to it. */
+export const showcaseHome = campaigns.length > 0 ? `${import.meta.env.BASE_URL}showcase/` : null;
 
 /** The showcase's address for a campaign: the newest at /showcase/, each other at /showcase/<version>/. */
 export const showcasePath = (campaign: Campaign) =>
