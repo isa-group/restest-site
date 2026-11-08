@@ -1,7 +1,7 @@
 // What the showcase shows of the campaigns isa-group/restest-dataset publishes, one release each: which
 // campaigns there are, and the row of each API in a campaign's table, read from that API's report.json.
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { minutes } from './landing-run.mjs';
 
@@ -13,8 +13,8 @@ const FORMAT = 1;
 
 const TAG = /^showcase-v(\d+)\.(\d+)\.(\d+)$/;
 
-/** A name that can be part of a path as it is: an API's id, read from another repository. */
-const SAFE = /^[a-z0-9][a-z0-9.-]*$/;
+/** A name that can be part of a path as it is: an API's id, read from another repository. "index" is the page's. */
+const SAFE = /^(?!index$)[a-z0-9][a-z0-9.-]*$/;
 
 /** Something in a campaign the site cannot be built from; it names the release or the file it is in. */
 export class ShowcaseError extends Error {
@@ -47,11 +47,17 @@ export function newerFirst(a, b) {
 /** A campaign in a folder holding its release's files, to preview one not published, such as a draft. */
 export function localCampaign(folder) {
   const dir = resolve(folder);
-  const file = (name) => (existsSync(join(dir, name)) ? join(dir, name) : null);
-  if (!file('manifest.json')) throw new ShowcaseError(folder, 'holds no manifest.json');
-  const tag = `showcase-v${JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')).restest?.version}`;
+  const has = (name) => existsSync(join(dir, name));
+  if (!has('manifest.json')) throw new ShowcaseError(folder, 'holds no manifest.json');
+  let version;
+  try {
+    version = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')).restest?.version;
+  } catch (error) {
+    throw new ShowcaseError(folder, `manifest.json cannot be read: ${error.message}`);
+  }
+  const tag = `showcase-v${version}`;
   if (!isCampaignTag(tag)) throw new ShowcaseError(folder, 'manifest.json names no version such as 2.5.0');
-  return { tag, file };
+  return { tag, has, file: (name) => (has(name) ? join(dir, name) : null) };
 }
 
 /** Fails, naming the release, unless its manifest is of the format the site reads and is the tag's campaign. */
@@ -117,14 +123,16 @@ export function mostErrors(rows) {
 }
 
 /**
- * Everything the showcase shows, from its campaigns, the newest first. Each campaign is its tag and a
- * function giving the local path of one of its release's files, or null when the release has none of that
- * name; a campaign's files are asked for all at once. The newest campaign's report.html files are copied
- * into `publicDir`, to be served by the site; an older campaign's rows link to theirs in the release.
+ * Everything the showcase shows, from its campaigns, put newest first. Each campaign is its tag, whether its
+ * release has a file of a name, and a function giving the local path of one of its files, or null when it has
+ * none; a campaign's files are asked for all at once. `publicDir` is emptied, then given the newest campaign's
+ * report.html files, to be served by the site; an older campaign's rows link to theirs in its release.
  */
 export async function buildShowcase(sources, { publicDir }) {
+  rmSync(publicDir, { recursive: true, force: true });
   const built = [];
-  for (const [index, { tag, file }] of sources.entries()) {
+  const newestFirst = [...sources].sort((a, b) => newerFirst(a.tag, b.tag));
+  for (const [index, { tag, has, file }] of newestFirst.entries()) {
     const read = async (name) => {
       const path = await file(name);
       if (!path) throw new ShowcaseError(tag, `the release has no ${name}, which its manifest names`);
@@ -159,6 +167,7 @@ export async function buildShowcase(sources, { publicDir }) {
         copyFileSync(pages[at], join(publicDir, version, `${entry.id}.html`));
         page = `showcase/${version}/${entry.id}.html`;
       } else if (entry.page) {
+        if (!has(entry.page)) throw new ShowcaseError(tag, `the release has no ${entry.page}, which its manifest names`);
         page = `https://github.com/${DATASET}/releases/download/${tag}/${entry.page}`;
       }
       return { ...row, page };

@@ -2,9 +2,11 @@
 #
 # The documentation is RESTest's at the version in restest-version. RESTest's workflow
 # documentation-site.yml writes it there when a release is published; that commit, like any other on
-# main, rebuilds and publishes the site. Every week the site is also built from RESTest's master, without
-# publishing it, to say that it still builds from what the next version will be: a page that lost its
-# title, a link to nothing or an index of another shape fails that build, naming the file.
+# main, rebuilds and publishes the site. The showcase is the campaigns isa-group/restest-dataset publishes
+# as releases, read at each build; once a campaign is published, this workflow is started by hand to show
+# it. Every week the site is also built from RESTest's master, without publishing it, to say that it still
+# builds from what the next version will be: a page that lost its title, a link to nothing or an index of
+# another shape fails that build, naming the file.
 
 name: Site
 

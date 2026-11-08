@@ -1,8 +1,8 @@
 ---
 /*
  * The showcase: what a released RESTest found on the APIs of the Web Fuzzing Dataset, one campaign for each
- * version, as isa-group/restest-dataset publishes them (scripts/sync-showcase.mjs reads them). The newest is at
- * /showcase/ and each older one at /showcase/<version>/; with no campaign published there is no showcase.
+ * version, as isa-group/restest-dataset publishes them (scripts/sync-showcase.mjs reads them). Each is at
+ * /showcase/<version>/, and the newest at /showcase/ too; with no campaign published there is no showcase.
  *
  * A row is an API: its figures from its report.json, its operations by what was found, and its report.html,
  * which the site serves for the newest campaign and an older campaign's release holds. An API RESTest could not
@@ -17,11 +17,12 @@ import { campaigns, day, outcomes, showcasePath, type Campaign } from '../../com
 import landing from '../../generated/landing.json';
 import '../../styles/showcase.css';
 
+// Every campaign at /showcase/<version>/, an address that stays its own, and the newest at /showcase/ too.
 export function getStaticPaths() {
-  return campaigns.map((campaign, index) => ({
-    params: { campaign: index === 0 ? undefined : campaign.version },
-    props: { campaign },
-  }));
+  return [
+    ...(campaigns.length ? [{ params: { campaign: undefined }, props: { campaign: campaigns[0] } }] : []),
+    ...campaigns.map((campaign) => ({ params: { campaign: campaign.version }, props: { campaign } })),
+  ];
 }
 
 const { campaign } = Astro.props as { campaign: Campaign };
@@ -134,7 +135,10 @@ const label = (c: Campaign) => `RESTest ${c.version} · ${day(c.date)}`;
                     </td>
                   </>
                 ) : (
-                  <td class="outcome" colspan="5" title={api.reason ?? undefined}>{outcomes[api.outcome] ?? api.outcome}</td>
+                  <td class="outcome" colspan="5">
+                    {outcomes[api.outcome] ?? api.outcome}
+                    {api.reason && <span class="why">: {api.reason}</span>}
+                  </td>
                 )}
                 <td class="rep">
                   {api.page && (

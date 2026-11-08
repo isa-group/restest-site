@@ -194,6 +194,10 @@
   font-weight: 400;
 }
 
+.sc-table .why {
+  font-size: var(--rt-text-min);
+}
+
 .opsbar {
   display: flex;
   align-items: center;

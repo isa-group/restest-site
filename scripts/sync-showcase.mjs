@@ -12,12 +12,12 @@
 // anything the site cannot be built from. GITHUB_TOKEN, when set, is sent to GitHub's API alone, to list the
 // releases.
 
-import { existsSync, rmSync } from 'node:fs';
+import { existsSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { write } from './lib/files.mjs';
-import { buildShowcase, campaigns, DATASET, localCampaign, newerFirst, ShowcaseError } from './lib/showcase.mjs';
+import { buildShowcase, campaigns, DATASET, localCampaign, ShowcaseError } from './lib/showcase.mjs';
 
 const site = fileURLToPath(new URL('..', import.meta.url));
 const TRIES = 3;
@@ -25,12 +25,8 @@ const AT_ONCE = 6;
 
 async function main() {
   const { values } = parseArgs({ options: { from: { type: 'string', multiple: true } } });
-  const sources = values.from
-    ? values.from.map(localCampaign).sort((a, b) => newerFirst(a.tag, b.tag))
-    : await published();
-  const publicDir = join(site, 'public/showcase');
-  rmSync(publicDir, { recursive: true, force: true });
-  const showcase = await buildShowcase(sources, { publicDir });
+  const sources = values.from ? values.from.map(localCampaign) : await published();
+  const showcase = await buildShowcase(sources, { publicDir: join(site, 'public/showcase') });
   write(join(site, 'src/generated/showcase.json'), `${JSON.stringify(showcase, null, 2)}\n`);
   const said = showcase.campaigns.map((c, i) => `${c.version} (${c.apis.length} APIs${i === 0 ? ', their reports served' : ''})`);
   console.log(said.length ? `Read the showcase's campaigns: ${said.join(', ')}` : 'No campaign is published yet');
@@ -48,12 +44,17 @@ async function published() {
     const assets = new Map(release.assets.map((asset) => [asset.name, asset]));
     return {
       tag: release.tag_name,
+      has: (name) => assets.has(name),
       file: async (name) => {
         const asset = assets.get(name);
         if (!asset) return null;
         const kept = join(site, '.restest/showcase', release.tag_name, `${asset.id}-${name}`);
-        // A release's file is public: no token is sent with it.
-        if (!existsSync(kept)) write(kept, await atMostSixAtOnce(() => fetchTrying(asset.browser_download_url, {})));
+        if (!existsSync(kept)) {
+          // A release's file is public: no token is sent with it. It is kept under its name only once whole,
+          // so that a download cut short is fetched again rather than read.
+          write(`${kept}.part`, await atMostSixAtOnce(() => fetchTrying(asset.browser_download_url, {})));
+          renameSync(`${kept}.part`, kept);
+        }
         return kept;
       },
     };
@@ -64,7 +65,12 @@ async function published() {
 async function json(url) {
   const headers = { Accept: 'application/vnd.github+json' };
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  return JSON.parse((await fetchTrying(url, headers)).toString('utf8'));
+  const body = (await fetchTrying(url, headers)).toString('utf8');
+  try {
+    return JSON.parse(body);
+  } catch (error) {
+    throw new ShowcaseError(url.replace(/\?.*/, ''), `answered something other than JSON: ${error.message}`);
+  }
 }
 
 let running = 0;

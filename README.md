@@ -114,8 +114,8 @@ look, from the same tokens.
 [`src/pages/showcase/[...campaign].astro`](<src/pages/showcase/[...campaign].astro>) is what a released RESTest
 found on the APIs of the [Web Fuzzing Dataset](https://github.com/WebFuzzing/Dataset), one campaign for each
 version, in the look the mock-up settled: a table of the APIs, each with its figures, its operations by what
-was found, and its `report.html`. The newest campaign is at `/showcase/`, each older one at
-`/showcase/<version>/`.
+was found, and its `report.html`. Each campaign is at `/showcase/<version>/`, and the newest at `/showcase/`
+too.
 
 - **The campaigns** are the releases of [isa-group/restest-dataset](https://github.com/isa-group/restest-dataset)
   tagged `showcase-v<version>`, made by its workflow and published by hand, never a draft or a prerelease;
@@ -126,7 +126,9 @@ was found, and its `report.html`. The newest campaign is at `/showcase/`, each o
   campaign's `report.html` files are copied into `public/showcase/<version>/`, to be served by the site; an
   older campaign's rows link to theirs in its release. A release's files are kept in `.restest/showcase/`
   between builds. The build stops, naming the release and the file, on a manifest of another format or of
-  another version, a file the manifest names and the release lacks, or a report it cannot read.
+  another version, a file the manifest names and the release lacks, or a report it cannot read. Listing
+  the releases needs no account; `GITHUB_TOKEN`, when set, as the build on GitHub sets it, is sent with
+  that listing alone, so that runners sharing an address do not meet GitHub's limit on anonymous calls.
 - **With no campaign published**, as before 2.5.0's, there is no showcase, no link to it and no band.
 - **A campaign not published yet**, such as a draft, can be looked at from a folder holding its files:
 
@@ -169,7 +171,10 @@ still builds from what the next version will be.
   in the header, on a phone too, and on the landing page, which keeps its own choice.
 - [`src/styles/landing.css`](src/styles/landing.css) — the landing page in that look, as the mock-up
   drew it; the black box of its animation keeps colours of its own. The page preloads Space Grotesk,
-  the face of its title.
+  the face of its title. The band "On real APIs" shares its figures' colours and its table's cells with
+  the showcase.
+- [`src/styles/showcase.css`](src/styles/showcase.css) — the showcase in that look, as the mock-up drew
+  it: the campaign picker, the filter, the legend, the five figures and the table with its bars.
 - [`src/assets/logo.svg`](src/assets/logo.svg) and [`src/assets/logo-dark.svg`](src/assets/logo-dark.svg)
   — RESTest's logo, for light and dark backgrounds, with the check in the accent colour. Being images, they
   cannot read `tokens.css`: they repeat its `--rt-text` and `--rt-accent` by value, and change with them.

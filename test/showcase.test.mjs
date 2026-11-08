@@ -39,6 +39,7 @@ test('a manifest of another format, another version or an unsafe name stops the 
   assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, format: 2 }), /^ShowcaseError: showcase-v2\.5\.0: .*format 2/);
   assert.throws(() => checkManifest('showcase-v2.6.0', manifest), /campaign of RESTest 2\.5\.0/);
   assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, apis: [{ id: '../index' }] }), ShowcaseError);
+  assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, apis: [{ id: 'index' }] }), /names an API "index"/);
   assert.throws(() => checkManifest('showcase-v2.5.0', { ...manifest, apis: undefined }), /lists no APIs/);
 });
 
@@ -123,11 +124,14 @@ function campaignFolder(root, version, apis) {
 test("the newest campaign's reports are served by the site, and an older one's rows link to its release", async () => {
   const root = mkdtempSync(join(tmpdir(), 'showcase-'));
   try {
+    // Given oldest first, as `--from` may give them; a report left from an earlier build is thrown away.
     const sources = [
+      campaignFolder(root, '2.5.0', [{ id: 'clinic' }, { id: 'pets' }]),
       campaignFolder(root, '2.6.0', [{ id: 'clinic' }, { id: 'slow', ran: false }, { id: 'bare', page: false }]),
-      campaignFolder(root, '2.5.0', [{ id: 'clinic' }]),
     ];
     const publicDir = join(root, 'public');
+    mkdirSync(join(publicDir, '2.5.0'), { recursive: true });
+    writeFileSync(join(publicDir, '2.5.0', 'stale.html'), 'left from a preview');
 
     const { campaigns: built } = await buildShowcase(sources, { publicDir });
 
@@ -153,6 +157,22 @@ test('a folder without a manifest, or whose manifest names no version, is no cam
     assert.throws(() => localCampaign(root), /holds no manifest\.json/);
     writeFileSync(join(root, 'manifest.json'), JSON.stringify({ format: 1, restest: { version: 'master' } }));
     assert.throws(() => localCampaign(root), /names no version/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('an unreadable report, or an older campaign\'s page the release lacks, stops the build, naming both', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'showcase-'));
+  try {
+    const newest = campaignFolder(root, '2.6.0', [{ id: 'clinic' }]);
+    writeFileSync(join(root, '2.6.0', 'clinic.report.json'), '{');
+    await assert.rejects(buildShowcase([newest], { publicDir: join(root, 'public') }), /^ShowcaseError: showcase-v2\.6\.0: clinic\.report\.json cannot be read/);
+
+    const older = campaignFolder(root, '2.5.0', [{ id: 'pets' }]);
+    rmSync(join(root, '2.5.0', 'pets.report.html'));
+    const fresh = campaignFolder(root, '2.7.0', [{ id: 'clinic' }]);
+    await assert.rejects(buildShowcase([older, fresh], { publicDir: join(root, 'public') }), /showcase-v2\.5\.0: the release has no pets\.report\.html/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

@@ -41,7 +41,8 @@ export const campaigns: Campaign[] = Object.values(written)[0]?.campaigns ?? [];
 /** The showcase's address, when a campaign is published, for the links to it. */
 export const showcaseHome = campaigns.length > 0 ? `${import.meta.env.BASE_URL}showcase/` : null;
 
-/** The showcase's address for a campaign: the newest at /showcase/, each other at /showcase/<version>/. */
+/** The showcase's address for a campaign, as the picker links it: the newest at /showcase/, each other at
+ * /showcase/<version>/. */
 export const showcasePath = (campaign: Campaign) =>
   campaign === campaigns[0] ? 'showcase/' : `showcase/${campaign.version}/`;
 
