@@ -9,12 +9,12 @@
  * drawn smaller than the page's smallest.
  */
 import { minutesInWords, type LandingRun } from './run';
+import { number } from './format';
 
 interface Props {
   run: LandingRun;
 }
 const { run } = Astro.props;
-const number = (n: number) => n.toLocaleString('en-US');
 const length = minutesInWords(run.minutes);
 
 // The lanes from RESTest to the API, each with the method of the request it carries and the class of its reply.

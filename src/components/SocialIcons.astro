@@ -1,0 +1,24 @@
+---
+/*
+ * The links at the right of the documentation's header: the showcase, when a campaign is published, then
+ * Starlight's own link to RESTest on GitHub.
+ */
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+import { campaigns } from './showcase/data';
+
+const showcase = campaigns.length > 0 ? `${import.meta.env.BASE_URL}showcase/` : null;
+---
+
+{showcase && <a class="rt-showcase" href={showcase}>Showcase</a>}
+<Default {...Astro.props} />
+
+<style>
+  .rt-showcase {
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    text-decoration: none;
+  }
+  .rt-showcase:hover {
+    color: var(--sl-color-white);
+  }
+</style>

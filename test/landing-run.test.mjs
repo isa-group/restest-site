@@ -32,7 +32,8 @@ test('the four counts, on how many operations, and the operations the document h
   assert.equal(run.title, 'REST Petclinic backend API documentation');
   assert.equal(run.minutes, 1);
   assert.equal(landingRun({ ...report, timeline: { budget: 'PT1H30M' } }).minutes, 90);
-  assert.equal(landingRun({ ...report, timeline: { budget: 'PT45S' } }).minutes, null);
+  assert.equal(landingRun({ ...report, timeline: { budget: 'PT45S' } }).minutes, 0.75);
+  assert.equal(landingRun({ ...report, timeline: { budget: 'P1D' } }).minutes, null);
   assert.deepEqual(
     [run.requests, run.errors, run.operationsWithErrors, run.warnings, run.operationsWithWarnings, run.operations],
     [46136, 6800, 30, 18520, 39, 3],

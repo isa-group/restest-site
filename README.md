@@ -7,7 +7,7 @@ APIs. It will hold three parts, each added in a pull request of its own:
 - `/`, the landing page: what RESTest is, and how to start;
 - `/showcase`, what RESTest finds on real APIs.
 
-The documentation and the landing page are built; the showcase is not yet. The site is built with
+All three are built; the showcase appears once a campaign is published. The site is built with
 [Astro](https://astro.build) and the documentation with [Starlight](https://starlight.astro.build),
 and both are published on GitHub Pages.
 
@@ -17,18 +17,18 @@ With Node 26 (`.nvmrc`):
 
 ```bash
 npm ci
-npm test            # the step that copies RESTest's documentation, tested on its own
+npm test            # the steps that copy RESTest's documentation and read the showcase, tested on their own
 npm run build       # the site, in dist/
 npm run preview     # dist/ served at http://localhost:4321/restest-site/
 npm run dev         # or the site served as it is edited
 ```
 
-`npm run build` and `npm run dev` first copy the documentation of the version in `restest-version`.
-To build from another version, or from a copy of RESTest on your machine:
+`npm run build` and `npm run dev` first copy the documentation of the version in `restest-version`, then
+read the showcase's campaigns. To build from another version, or from a copy of RESTest on your machine:
 
 ```bash
-npm run sync -- --ref master && npx astro build
-npm run sync -- --from ../RESTest && npx astro dev
+npm run sync -- --ref master && npm run sync-showcase && npx astro build
+npm run sync -- --from ../RESTest && npm run sync-showcase && npx astro dev
 ```
 
 ## The documentation
@@ -105,6 +105,43 @@ look, from the same tokens.
   button pauses it otherwise.
 - **The theme** is picked with the same three buttons as the documentation, and kept apart from it,
   under `restest-landing-theme`.
+- **The band "On real APIs"** shows the showcase's newest campaign: its figures, and the five APIs with the
+  most errors. With no campaign published the band is left out, and the bands after it are numbered, and
+  their backgrounds alternate, as if it were not there.
+
+## The showcase
+
+[`src/pages/showcase/[...campaign].astro`](<src/pages/showcase/[...campaign].astro>) is what a released RESTest
+found on the APIs of the [Web Fuzzing Dataset](https://github.com/WebFuzzing/Dataset), one campaign for each
+version, in the look the mock-up settled: a table of the APIs, each with its figures, its operations by what
+was found, and its `report.html`. The newest campaign is at `/showcase/`, each older one at
+`/showcase/<version>/`.
+
+- **The campaigns** are the releases of [isa-group/restest-dataset](https://github.com/isa-group/restest-dataset)
+  tagged `showcase-v<version>`, made by its workflow and published by hand, never a draft or a prerelease;
+  that repository's README says what a release holds. Before each build,
+  [`scripts/sync-showcase.mjs`](scripts/sync-showcase.mjs) lists them, the newest version first, reads each
+  campaign's `manifest.json` and every API's `report.json`, and writes what the pages show in
+  `src/generated/showcase.json` ([`scripts/lib/showcase.mjs`](scripts/lib/showcase.mjs)). The newest
+  campaign's `report.html` files are copied into `public/showcase/<version>/`, to be served by the site; an
+  older campaign's rows link to theirs in its release. A release's files are kept in `.restest/showcase/`
+  between builds. The build stops, naming the release and the file, on a manifest of another format or of
+  another version, a file the manifest names and the release lacks, or a report it cannot read.
+- **With no campaign published**, as before 2.5.0's, there is no showcase, no link to it and no band.
+- **A campaign not published yet**, such as a draft, can be looked at from a folder holding its files:
+
+  ```bash
+  gh release download showcase-v2.5.0 --repo isa-group/restest-dataset --dir ../campaign
+  npm run sync && node scripts/sync-showcase.mjs --from ../campaign && npx astro build && npm run preview
+  ```
+
+- **When a campaign is published**, the site is not rebuilt by itself: start its workflow by hand,
+  `gh workflow run site.yml --repo isa-group/restest-site`, or let the next commit to `main` do it.
+- **An API its author asks to have removed** is taken out of every campaign's release: its two reports
+  deleted, and its entry taken out of the release's `manifest.json`, uploaded again. The next build no
+  longer shows it.
+- **The theme** is kept apart from the first page's and the documentation's, under
+  `restest-showcase-theme`. Without JavaScript every row shows, and the filter is not drawn.
 
 ### When it is rebuilt
 

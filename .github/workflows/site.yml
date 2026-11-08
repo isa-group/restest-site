@@ -40,8 +40,17 @@ jobs:
       - run: npm ci
       - run: npm test
 
-      - name: Build it, with the documentation of the version in restest-version
-        run: npm run build
+      # The token, read-only, reaches only the step that lists the dataset's releases, never the build.
+      - name: Copy the documentation of the version in restest-version
+        run: npm run sync
+
+      - name: Read the showcase's campaigns
+        run: npm run sync-showcase
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Build it
+        run: npx astro build
 
       # Uploaded on pull requests too, so that a change can be looked at before it is published.
       - name: Keep the site
@@ -89,5 +98,13 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - name: Build it, with the documentation on master
-        run: npm run sync -- --ref master && npx astro build
+      - name: Copy the documentation on master
+        run: npm run sync -- --ref master
+
+      - name: Read the showcase's campaigns
+        run: npm run sync-showcase
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Build it
+        run: npx astro build

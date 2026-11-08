@@ -1,0 +1,459 @@
+/*
+ * The showcase, and the first page's band "On real APIs", as the site's mock-up draws them, on the site's
+ * tokens. Figures of errors and warnings are in their colours, as tokens.css allows; the bar's colours are
+ * marks, each also said in words.
+ */
+
+/* The band on the first page: four figures, and the APIs with the most errors. */
+.real-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--rt-line);
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius-card);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.real-stats div {
+  background: var(--rt-surface);
+  padding: 18px 20px;
+  font-size: var(--rt-text-min);
+  color: var(--rt-text-3);
+}
+
+.real-stats b {
+  display: block;
+  font: 600 30px/1.15 var(--rt-font-num);
+  letter-spacing: -0.02em;
+  color: var(--rt-text);
+  font-variant-numeric: tabular-nums;
+}
+
+:is(.real-stats, .sc-stats) b.err,
+:is(.mini, .sc-table) td.err {
+  color: var(--rt-error);
+}
+
+:is(.real-stats, .sc-stats) b.warn,
+:is(.mini, .sc-table) td.warn {
+  color: var(--rt-warning);
+}
+
+.mini {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+  background: var(--rt-surface);
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius-card);
+  overflow: hidden;
+}
+
+.mini th {
+  text-align: left;
+  font-size: var(--rt-text-min);
+  font-weight: 600;
+  color: var(--rt-text-2);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--rt-line);
+}
+
+.mini td,
+.mini tbody th {
+  padding: 10px 16px;
+  border-top: 1px solid var(--rt-line-faint);
+  border-bottom: 0;
+}
+
+.mini tbody tr:first-child :is(td, th) {
+  border-top: 0;
+}
+
+:is(.mini, .sc-table) .api {
+  font: 400 var(--rt-text-min) var(--rt-font-mono);
+  color: var(--rt-text);
+  text-align: left;
+}
+
+:is(.mini, .sc-table) .num {
+  text-align: right;
+  font-family: var(--rt-font-num);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+/* The showcase's page. */
+.sc {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 40px 72px;
+}
+
+.sc .eyebrow {
+  font: 500 var(--rt-text-min) / 1 var(--rt-font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rt-accent-text);
+}
+
+.sc-head h1 {
+  font: 600 clamp(32px, 4vw, 44px) / 1.1 var(--rt-font-sans);
+  letter-spacing: -0.02em;
+  margin: 10px 0;
+}
+
+.sc-lead {
+  max-width: 720px;
+  margin: 0;
+  color: var(--rt-text-2);
+  font-size: 17px;
+}
+
+.sc-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+  margin: 28px 0 14px;
+}
+
+.sc .select,
+.sc .filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius);
+  background: var(--rt-surface);
+  font-size: var(--rt-text-min);
+}
+
+.sc details.select {
+  position: relative;
+  display: block;
+  padding: 0;
+}
+
+.sc details.select summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.sc details.select ul {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius);
+  background: var(--rt-surface);
+}
+
+.sc details.select a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--rt-text);
+  white-space: nowrap;
+}
+
+.sc details.select a[aria-current] {
+  color: var(--rt-accent-text);
+  font-weight: 600;
+}
+
+.sel-l {
+  color: var(--rt-text-3);
+}
+
+.sel-v {
+  font-weight: 500;
+}
+
+.sc .filter {
+  flex: 0 1 280px;
+}
+
+.sc .filter input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--rt-text);
+  font: inherit;
+}
+
+:root:not(.js) .sc .filter {
+  display: none;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-left: auto;
+  font-size: var(--rt-text-min);
+  color: var(--rt-text-2);
+}
+
+.legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+
+.sc-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius);
+  background: var(--rt-surface);
+  margin-bottom: 16px;
+}
+
+.sc-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 18px;
+}
+
+.sc-stats div + div {
+  border-left: 1px solid var(--rt-line);
+}
+
+.sc-stats b {
+  font: 600 26px/1.2 var(--rt-font-num);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.sc-stats span {
+  font-size: var(--rt-text-min);
+  color: var(--rt-text-2);
+}
+
+.sc-table {
+  /* Holds what is said only to screen readers, so that none of it widens the page. */
+  position: relative;
+  overflow-x: auto;
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius);
+  background: var(--rt-surface);
+}
+
+.sc-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sc-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--rt-surface);
+  text-align: left;
+  font-size: var(--rt-text-min);
+  font-weight: 600;
+  color: var(--rt-text-2);
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--rt-line);
+  white-space: nowrap;
+}
+
+.sc-table thead th.num {
+  text-align: right;
+}
+
+.sc-table tbody :is(td, th) {
+  padding: 0 14px;
+  height: 44px;
+  border-top: 1px solid var(--rt-line-faint);
+  font-size: 15px;
+}
+
+.sc-table tbody tr:first-child :is(td, th) {
+  border-top: 0;
+}
+
+.sc-table tbody tr:hover {
+  background: var(--rt-surface-2);
+}
+
+.sc-table .show-s {
+  display: none;
+}
+
+.sc-table td.zero {
+  color: var(--rt-text-3);
+  font-weight: 400;
+}
+
+.sc-table td.outcome {
+  color: var(--rt-text-3);
+}
+
+.opsbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.bar {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--rt-surface-2);
+}
+
+.bar span {
+  height: 100%;
+}
+
+.b-e {
+  background: var(--rt-error);
+}
+
+.b-w {
+  background: var(--rt-warning);
+}
+
+.b-k {
+  background: var(--rt-ok);
+}
+
+.b-x {
+  background: var(--rt-text-3);
+}
+
+.bar-n {
+  width: 64px;
+  font: 500 var(--rt-text-min) / 1 var(--rt-font-num);
+  font-variant-numeric: tabular-nums;
+  color: var(--rt-text-2);
+  text-align: right;
+}
+
+.sc-table .rep {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.sc-table td.rep a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--rt-accent-text);
+  font-weight: 500;
+  font-size: var(--rt-text-min);
+}
+
+.sc-none {
+  margin: 0;
+  padding: 16px;
+  color: var(--rt-text-3);
+}
+
+.sc-foot {
+  max-width: 900px;
+  margin: 16px 0 0;
+  font-size: var(--rt-text-min);
+  line-height: 1.6;
+  color: var(--rt-text-3);
+}
+
+.sc-foot a {
+  color: var(--rt-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 1100px) {
+  .sc-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sc-stats div:nth-child(4) {
+    border-left: 0;
+  }
+
+  .sc-stats div:nth-child(n + 4) {
+    border-top: 1px solid var(--rt-line);
+  }
+
+  .legend {
+    margin-left: 0;
+  }
+}
+
+/* On a phone, the table keeps the API, its errors, the bar and the report; the bar is said in words too. */
+@media (max-width: 760px) {
+  .sc {
+    padding: 36px 16px 48px;
+  }
+
+  .sc-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sc-stats div:nth-child(n) {
+    border-left: 0;
+    border-top: 1px solid var(--rt-line);
+  }
+
+  .sc-stats div:nth-child(-n + 2) {
+    border-top: 0;
+  }
+
+  .sc-stats div:nth-child(even) {
+    border-left: 1px solid var(--rt-line);
+  }
+
+  .sc-table .hide-s {
+    display: none;
+  }
+
+  .sc-table .show-s {
+    display: inline;
+  }
+
+  .opsbar {
+    min-width: 150px;
+  }
+
+  .bar {
+    min-width: 70px;
+  }
+
+  .bar-n {
+    width: auto;
+  }
+
+  .real-stats b {
+    font-size: 22px;
+  }
+
+  .mini :is(th, td):nth-child(2) {
+    display: none;
+  }
+}

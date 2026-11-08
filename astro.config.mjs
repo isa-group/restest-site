@@ -36,6 +36,8 @@ export default defineConfig({
         ThemeSelect: './src/components/ThemeSelect.astro',
         // A page's text, with its Mermaid diagrams drawn.
         MarkdownContent: './src/components/MarkdownContent.astro',
+        // The showcase beside the link to GitHub, when a campaign is published.
+        SocialIcons: './src/components/SocialIcons.astro',
       },
       sidebar,
       pagination: false,
