@@ -1025,6 +1025,7 @@ code {
 }
 
 .band.contact p a,
+.band-copy p a,
 .rp-cap a {
   color: var(--rt-accent-text);
   text-decoration: underline;

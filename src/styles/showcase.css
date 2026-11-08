@@ -382,6 +382,7 @@
   color: var(--rt-text-3);
 }
 
+.sc-lead a,
 .sc-foot a {
   color: var(--rt-accent-text);
   text-decoration: underline;
