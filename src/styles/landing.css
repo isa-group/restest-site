@@ -1,0 +1,1202 @@
+/*
+ * The first page, in the look the site's mock-up settled: horizontal bands under a centred top, each band
+ * appearing as it is reached. Colours, type and corners come from tokens.css, which follows the theme the
+ * reader picks; the black box of the animation keeps colours of its own, as the mock-up drew it.
+ *
+ * Nothing is hidden unless the page's script runs: the root gets the class `js` before the page is drawn,
+ * and only then do bands wait to appear and tabs show one panel at a time. With JavaScript off, the
+ * page shows everything; with less motion asked for, nothing moves.
+ */
+
+:root {
+  --box-fill: light-dark(#0b0d10, #000000);
+  --box-text: #f1f3f6;
+  --box-text-2: light-dark(#9aa3af, #8b94a1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--rt-bg);
+  color: var(--rt-text);
+  font: 400 16px/1.55 var(--rt-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+code {
+  font-family: var(--rt-font-mono);
+}
+
+:focus-visible {
+  outline: 2px solid var(--rt-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* One picture for each theme: the logo, and the report's pages. Without JavaScript nothing sets the theme,
+   and the system's decides. */
+:root[data-theme='light'] .for-dark,
+:root[data-theme='dark'] .for-light {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .for-light {
+    display: none;
+  }
+}
+
+@media not (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .for-dark {
+    display: none;
+  }
+}
+
+/* What only works with the page's script is not drawn without it. */
+:root:not(.js) :is(.copy, .live, rt-theme-select) {
+  display: none;
+}
+
+/* The top bar. */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 68px;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--rt-line);
+}
+
+.brand img {
+  display: block;
+  height: 34px;
+  width: auto;
+}
+
+.nav-links {
+  display: flex;
+  gap: 26px;
+  font-size: 15px;
+  color: var(--rt-text-2);
+}
+
+.nav-links a:hover,
+.gh:hover {
+  color: var(--rt-text);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.ver {
+  padding: 6px 9px;
+  border: 1px solid var(--rt-line);
+  border-radius: 999px;
+  font: 500 var(--rt-text-min)/1 var(--rt-font-mono);
+  color: var(--rt-text-2);
+}
+
+.gh {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  color: var(--rt-text-2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--rt-accent);
+  color: var(--rt-on-accent);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--rt-text);
+  box-shadow: inset 0 0 0 1px var(--rt-line-strong);
+}
+
+/* The top of the page. */
+.hero {
+  padding: 96px 40px 104px;
+  overflow: hidden;
+  text-align: center;
+  background: radial-gradient(900px 480px at 50% 35%, var(--rt-glow), transparent 70%);
+}
+
+.hero h1 {
+  margin: 0 0 20px;
+  font: 600 76px/1.02 var(--rt-font-sans);
+  letter-spacing: -0.045em;
+}
+
+.hero .lead {
+  max-width: 600px;
+  margin: 0 auto 38px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--rt-accent-text);
+}
+
+.install {
+  max-width: 660px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* The tabs are drawn only when the script that picks between them runs. */
+.tabs {
+  display: none;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.js .tabs {
+  display: flex;
+}
+
+.tabs button {
+  flex: none;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--rt-text-3);
+  font-size: var(--rt-text-min);
+  font-weight: 500;
+}
+
+.tabs button[aria-selected='true'] {
+  background: var(--rt-surface);
+  color: var(--rt-text);
+}
+
+.cmd {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 10px 12px 14px;
+  border: 1px solid var(--rt-line);
+  border-radius: 0 var(--rt-radius) var(--rt-radius) var(--rt-radius);
+  background: var(--rt-surface);
+}
+
+.cmd code {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--rt-text-min);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.copy {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--rt-line);
+  border-radius: 8px;
+  background: var(--rt-surface-2);
+  color: var(--rt-text-2);
+  font-size: var(--rt-text-min);
+}
+
+.copy:hover {
+  color: var(--rt-text);
+}
+
+.inst-note {
+  margin: 8px 2px 0;
+  font-size: var(--rt-text-min);
+  line-height: 1.45;
+  color: var(--rt-text-3);
+}
+
+/* Without JavaScript each command comes under its own name; with it, the tabs pick one. */
+.inst-name {
+  margin: 18px 2px 6px;
+  font-size: var(--rt-text-min);
+  font-weight: 600;
+  color: var(--rt-text-2);
+}
+
+.js .install .tabs ~ [role='tabpanel']:not(.on),
+.js .inst-name {
+  display: none;
+}
+
+/* The bands. */
+.band {
+  padding: 96px 40px;
+  border-top: 1px solid var(--rt-line);
+}
+
+.band.alt {
+  background: var(--rt-bg-alt);
+}
+
+.band-in {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.band-in.two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.js .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.js .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+.kicker {
+  margin-bottom: 16px;
+  font: 500 var(--rt-text-min)/1 var(--rt-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rt-accent-text);
+}
+
+.band h2 {
+  margin: 0 0 18px;
+  font: 600 44px/1.08 var(--rt-font-sans);
+  letter-spacing: -0.035em;
+}
+
+.band h2 .second {
+  color: var(--rt-accent-text);
+}
+
+.band-copy p,
+.band-head p {
+  max-width: 620px;
+  margin: 0 0 22px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--rt-text-2);
+}
+
+.band p code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--rt-surface-2);
+  font-size: 0.9em;
+}
+
+.band-head {
+  max-width: 760px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.band-head p {
+  margin: 0 auto;
+}
+
+.steps {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps li {
+  position: relative;
+  padding: 14px 0 14px 44px;
+  border-top: 1px solid var(--rt-line);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--rt-text-2);
+  counter-increment: step;
+}
+
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 13px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rt-line-strong);
+  border-radius: 50%;
+  font: 600 var(--rt-text-min) var(--rt-font-mono);
+  color: var(--rt-accent-text);
+}
+
+.steps b,
+.flow li b {
+  font-weight: 600;
+  color: var(--rt-text);
+}
+
+/* How it works: the run, as an animation of the black box. */
+.panel {
+  container-type: inline-size;
+  overflow: hidden;
+  border: 1px solid var(--rt-line-strong);
+  border-radius: 16px;
+  background: var(--rt-surface);
+  box-shadow: 0 30px 80px -40px var(--rt-glow);
+}
+
+.panel-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+  border-bottom: 1px solid var(--rt-line);
+  font: 500 var(--rt-text-min)/1.3 var(--rt-font-mono);
+  color: var(--rt-text-3);
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--rt-accent-text);
+}
+
+.live:hover {
+  background: var(--rt-surface-2);
+}
+
+.live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rt-accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.live .when-paused,
+.paused .live .when-running {
+  display: none;
+}
+
+.paused .live .when-paused {
+  display: inline;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.bb {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 8px 12px 0;
+}
+
+.bb .node rect {
+  fill: var(--rt-surface-2);
+  stroke: var(--rt-line-strong);
+}
+
+.bb text {
+  font-family: var(--rt-font-mono);
+  font-size: 18px;
+}
+
+.bb .t1 {
+  font-weight: 600;
+  fill: var(--rt-text);
+}
+
+.bb .t2 {
+  fill: var(--rt-text-3);
+}
+
+.bb .feed {
+  fill: none;
+  stroke: var(--rt-line-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+}
+
+.bb .lane {
+  fill: none;
+  stroke: var(--rt-line-strong);
+  stroke-width: 1.2;
+}
+
+.bb .api rect {
+  fill: var(--box-fill);
+  stroke: var(--rt-accent);
+  stroke-opacity: 0.55;
+}
+
+.bb .api text {
+  text-anchor: middle;
+}
+
+.bb .api .t1 {
+  font-size: 24px;
+  fill: var(--box-text);
+}
+
+.bb .api .t2 {
+  fill: var(--box-text-2);
+}
+
+.bb .req rect {
+  fill: var(--rt-surface);
+  stroke: var(--rt-accent);
+}
+
+.bb .req text {
+  font-weight: 600;
+  text-anchor: middle;
+  fill: var(--rt-accent-text);
+}
+
+.bb .rep {
+  fill: var(--rt-2xx);
+}
+
+.bb .rep.c4 {
+  fill: var(--rt-4xx);
+}
+
+.bb .rep.c5 {
+  fill: var(--rt-5xx);
+}
+
+.bb .rep.c3 {
+  fill: var(--rt-text-3);
+}
+
+/* A request goes from RESTest to the API along its lane, and its reply comes back, every five seconds. */
+.bb .req,
+.bb .rep {
+  opacity: 0;
+}
+
+.js .bb .req,
+.js .bb .rep {
+  animation-duration: 5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-delay: var(--delay);
+}
+
+.js .bb .req {
+  animation-name: request;
+}
+
+.js .bb .rep {
+  animation-name: reply;
+}
+
+@keyframes request {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x0), var(--y0));
+  }
+  6%,
+  40% {
+    opacity: 1;
+  }
+  45%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--x1), var(--y1));
+  }
+}
+
+@keyframes reply {
+  0%,
+  50% {
+    opacity: 0;
+    transform: translate(var(--x1), var(--y1));
+  }
+  52%,
+  88% {
+    opacity: 1;
+  }
+  90%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--x0), var(--y0));
+  }
+}
+
+/* A narrow panel draws the same run downwards, in text that never gets smaller than the rest. */
+.bb-v {
+  display: none;
+  padding: 16px 16px 0;
+  font: 400 var(--rt-text-min)/1.4 var(--rt-font-mono);
+}
+
+.bb-v .node {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--rt-line-strong);
+  border-radius: var(--rt-radius);
+  background: var(--rt-surface-2);
+  color: var(--rt-text-3);
+}
+
+.bb-v .node b {
+  font-weight: 600;
+  color: var(--rt-text);
+}
+
+.bb-v .node.api {
+  border-color: color-mix(in srgb, var(--rt-accent) 55%, transparent);
+  background: var(--box-fill);
+  color: var(--box-text-2);
+}
+
+.bb-v .node.api b {
+  color: var(--box-text);
+}
+
+.bb-v .feed {
+  width: 0;
+  height: 18px;
+  margin: 0 auto;
+  border-left: 1.5px dashed var(--rt-line-strong);
+}
+
+.bb-v .methods {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0;
+}
+
+.bb-v .methods span {
+  padding: 2px 9px;
+  border: 1px solid var(--rt-accent);
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--rt-accent-text);
+}
+
+.js .bb-v .methods span {
+  animation-name: sent;
+  animation-duration: 5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes sent {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  10%,
+  30% {
+    opacity: 1;
+  }
+}
+
+@container (max-width: 520px) {
+  .bb {
+    display: none;
+  }
+
+  .bb-v {
+    display: block;
+  }
+}
+
+/* The faults, one after another; each takes the place of the one before, and the tallest sets the height. */
+.faults {
+  display: grid;
+  gap: 8px;
+  margin: 12px 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fault {
+  padding: 12px 14px;
+  border: 1px solid var(--rt-line);
+  border-left: 3px solid var(--rt-error);
+  border-radius: 8px;
+  background: var(--rt-surface-2);
+  font: 400 var(--rt-text-min)/1.5 var(--rt-font-mono);
+}
+
+.js .fault {
+  grid-area: 1 / 1;
+  opacity: 0;
+  animation-name: cycle;
+  animation-duration: calc(var(--faults) * 4s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-delay: calc(var(--n) * 4s);
+}
+
+.fault.warning {
+  border-left-color: var(--rt-warning);
+}
+
+.fault .f1 {
+  font-family: var(--rt-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fault .sev {
+  margin-right: 10px;
+  font-family: var(--rt-font-mono);
+  color: var(--rt-error);
+}
+
+.fault.warning .sev {
+  color: var(--rt-warning);
+}
+
+.fault .code {
+  font-weight: 400;
+  color: var(--rt-text-3);
+}
+
+.fault .f2 {
+  color: var(--rt-text-2);
+  overflow-wrap: anywhere;
+}
+
+.fault .f2 b {
+  font-weight: 600;
+  color: var(--rt-text);
+}
+
+.fault .st {
+  color: var(--rt-text-3);
+}
+
+.fault .fs {
+  margin: 4px 0 2px;
+  font-family: var(--rt-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Paused by its button, or while it is out of view. */
+:is(.paused, .away) :is(.req, .rep, .fault, .live i, .methods span) {
+  animation-play-state: paused;
+}
+
+.counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+  border-top: 1px solid var(--rt-line);
+}
+
+.counts div {
+  padding: 12px 16px;
+  font: 400 var(--rt-text-min)/1.35 var(--rt-font-mono);
+  color: var(--rt-text-3);
+}
+
+.counts div + div {
+  border-left: 1px solid var(--rt-line);
+}
+
+.counts b {
+  display: block;
+  font: 600 22px/1.2 var(--rt-font-num);
+  font-variant-numeric: tabular-nums;
+  color: var(--rt-text);
+}
+
+.counts b.err {
+  color: var(--rt-error);
+}
+
+.counts b.warn {
+  color: var(--rt-warning);
+}
+
+@container (max-width: 560px) {
+  .counts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .counts div + div {
+    border-top: 1px solid var(--rt-line);
+    border-left: 0;
+  }
+}
+
+/* The report, in three views. */
+.rp {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.rp-tabs {
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+  overflow: visible;
+}
+
+.rp-tabs button {
+  padding: 8px 16px;
+  border: 1px solid var(--rt-line);
+  border-radius: 999px;
+  color: var(--rt-text-2);
+}
+
+.rp-tabs button[aria-selected='true'] {
+  border-color: var(--rt-line-strong);
+  background: var(--rt-surface);
+  color: var(--rt-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.rp-win {
+  overflow: hidden;
+  border: 1px solid var(--rt-line-strong);
+  border-radius: 16px;
+  background: var(--rt-surface);
+  box-shadow: 0 40px 100px -40px var(--rt-glow), 0 20px 50px -30px rgba(0, 0, 0, 0.4);
+}
+
+.rp-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--rt-line);
+  font-size: var(--rt-text-min);
+  color: var(--rt-text-3);
+}
+
+.rp-bar i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rt-line-strong);
+}
+
+.rp-bar span {
+  margin-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The frame keeps the tallest view's height, and a view not picked is not drawn, nor its picture fetched. */
+.js .rp-views {
+  aspect-ratio: var(--rp-ratio);
+}
+
+.js .rp-views > [role='tabpanel']:not(.on) {
+  display: none;
+}
+
+.rp-views a,
+.rp-views img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rp-views a {
+  cursor: zoom-in;
+}
+
+.rp-views h3 {
+  margin: 0;
+  padding: 10px 14px;
+  border-top: 1px solid var(--rt-line);
+  font-size: 15px;
+}
+
+.js .rp-views h3 {
+  display: none;
+}
+
+.rp-cap {
+  margin: 14px auto 0;
+  font-size: var(--rt-text-min);
+  text-align: center;
+  color: var(--rt-text-3);
+}
+
+/* What a coding agent does. */
+.flow {
+  padding: 22px;
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius-card);
+  background: var(--rt-surface);
+}
+
+.flow .you {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 92%;
+  margin-left: auto;
+  padding: 14px 16px;
+  border: 1.5px solid var(--rt-accent);
+  border-radius: 14px 14px 4px 14px;
+  background: var(--rt-accent-soft);
+  color: var(--rt-accent-strong);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rt-accent) 16%, transparent), 0 12px 30px -14px var(--rt-glow);
+}
+
+.flow .you .who {
+  font: 600 var(--rt-text-min) var(--rt-font-sans);
+}
+
+.flow .you code {
+  font-size: var(--rt-text-min);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  color: var(--rt-text);
+}
+
+.flow ol {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flow li {
+  position: relative;
+  padding: 12px 0 12px 30px;
+  border-top: 1px solid var(--rt-line);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--rt-text-2);
+}
+
+.flow li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 19px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rt-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--rt-accent) 20%, transparent);
+}
+
+/* The three inputs of a run. */
+.cards3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius-card);
+  background: var(--rt-surface);
+}
+
+.card code {
+  align-self: flex-start;
+  padding: 3px 9px;
+  border: 1px solid var(--rt-line-strong);
+  border-radius: 999px;
+  font-size: var(--rt-text-min);
+  color: var(--rt-accent-text);
+}
+
+.card b {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.card p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--rt-text-2);
+}
+
+.card-links {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--rt-line);
+}
+
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--rt-accent-text);
+}
+
+.arrow-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* About us. */
+.band.contact {
+  background: radial-gradient(700px 300px at 0% 100%, var(--rt-glow), transparent 70%), var(--rt-bg-tint);
+}
+
+.band.contact .band-head {
+  margin-bottom: 0;
+}
+
+.band.contact p a,
+.rp-cap a {
+  color: var(--rt-accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 22px;
+  margin-top: 28px;
+}
+
+/* The foot of the page. */
+.foot {
+  padding: 48px 40px;
+  border-top: 1px solid var(--rt-line);
+}
+
+.foot-in {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 32px;
+  max-width: 1180px;
+  margin: 0 auto;
+  font-size: var(--rt-text-min);
+}
+
+.foot-in > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.foot-brand img {
+  height: 56px;
+  width: auto;
+}
+
+.foot-brand p {
+  margin: 10px 0 0;
+  color: var(--rt-text-3);
+}
+
+.foot-in b {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.foot-in a {
+  color: var(--rt-text-2);
+}
+
+.foot-in a:hover {
+  color: var(--rt-text);
+}
+
+@media (max-width: 1100px) {
+  .band-in.two {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+}
+
+@media (max-width: 760px) {
+  .nav {
+    gap: 14px;
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .nav-links,
+  .ver,
+  .gh span {
+    display: none;
+  }
+
+  .nav .btn {
+    height: 36px;
+    padding: 0 14px;
+  }
+
+  .hero {
+    padding: 56px 16px 60px;
+  }
+
+  .hero h1 {
+    font-size: 44px;
+  }
+
+  .hero .lead {
+    font-size: 24px;
+  }
+
+  .tabs button {
+    padding: 8px 9px;
+  }
+
+  .band {
+    padding: 60px 16px;
+  }
+
+  .band h2 {
+    font-size: 32px;
+  }
+
+  .cards3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .foot {
+    padding: 36px 16px;
+  }
+
+  .foot-in {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .foot-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav {
+    gap: 10px;
+    padding: 0 12px;
+  }
+
+  .nav .gh {
+    display: none;
+  }
+
+  .nav-right {
+    gap: 10px;
+  }
+
+  .nav .brand img {
+    height: 28px;
+  }
+
+  .nav .btn {
+    padding: 0 12px;
+    font-size: var(--rt-text-min);
+  }
+}
+
+/* Less motion asked for: nothing moves, and the faults are a list. */
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .bb .req,
+  .bb .rep,
+  .live {
+    display: none;
+  }
+
+  .live i,
+  .bb-v .methods span {
+    animation: none;
+    opacity: 1;
+  }
+
+  .js .fault {
+    grid-area: auto;
+    opacity: 1;
+    animation: none;
+  }
+}
