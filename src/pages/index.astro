@@ -10,7 +10,6 @@
  * The page for coding agents, which RESTest has from 2.5.0 on and holds by a test of its own, is looked up
  * the same way, and the prompt and the band that point at it are left out of a version that does not have it.
  */
-import { getCollection } from 'astro:content';
 import type { ImageMetadata } from 'astro';
 import Landing from '../layouts/Landing.astro';
 import BlackBox from '../components/landing/BlackBox.astro';
@@ -19,26 +18,15 @@ import ReportViews from '../components/landing/ReportViews.astro';
 import { arrowIcon, githubIcon } from '../components/landing/icons';
 import { minutesInWords, type Landing as LandingData } from '../components/landing/run';
 import landing from '../generated/landing.json';
+import { siteLinks } from '../components/landing/links';
+import ShowcaseBand from '../components/showcase/ShowcaseBand.astro';
+import { campaigns } from '../components/showcase/data';
 import { repository } from '../../site.config.mjs';
 
 const { version, run, prompt: sentence } = landing as LandingData;
 const base = import.meta.env.BASE_URL;
 
-const pages = new Set((await getCollection('docs')).map((page) => page.id));
-const page = (id: string) => {
-  if (!pages.has(id)) throw new Error(`The first page links /${id}/, which the documentation of this version does not have`);
-  return `${base}${id}/`;
-};
-const links = {
-  docs: page('docs'),
-  reference: page('docs/command-line'),
-  start: page('docs/manual/a-first-run'),
-  manual: page('docs/manual'),
-  agents: pages.has('docs/for-coding-agents') ? page('docs/for-coding-agents') : null,
-  plans: page('docs/manual/plans'),
-  dictionaries: page('docs/manual/dictionaries'),
-  settings: page('docs/manual/settings'),
-};
+const links = await siteLinks();
 
 // The sentence RESTest's page for coding agents tells a person to give their agent, there from 2.5.0 on.
 const prompt = links.agents && sentence;
@@ -48,9 +36,27 @@ const pictures = Object.fromEntries(
   ).map(([path, image]) => [path.replace(/^.*\/(.+)\.png$/, '$1'), image]),
 );
 
-// The bands are numbered as they come, since two of them depend on the version.
-let numbered = 0;
-const kicker = (name: string) => `${String(++numbered).padStart(2, '0')} · ${name}`;
+// The newest campaign of the showcase, when one is published, for the band "On real APIs".
+const campaign = campaigns[0];
+
+// The bands are numbered as they come, and their backgrounds alternate, since three of them may be missing.
+const shown = [
+  run && 'How it works',
+  run && 'The report',
+  campaign && 'On real APIs',
+  prompt && 'For coding agents',
+  'Shaping a run',
+  'About us',
+].filter((name): name is string => Boolean(name));
+/** Where a band comes; the build stops if a band of the page is missing from the list above. */
+const place = (name: string) => {
+  const at = shown.indexOf(name);
+  if (at < 0) throw new Error(`The first page draws a band "${name}" that is not in its list of bands`);
+  return at;
+};
+const kicker = (name: string) => `${String(place(name) + 1).padStart(2, '0')} · ${name}`;
+/** A band's class: its background alternates with the band before it. The last band, "About us", has its own. */
+const band = (name: string) => (place(name) % 2 ? 'band alt' : 'band');
 ---
 
 <Landing
@@ -68,7 +74,7 @@ const kicker = (name: string) => `${String(++numbered).padStart(2, '0')} · ${na
   {
     run && (
       <>
-      <section class="band">
+      <section class={band('How it works')}>
         <div class="band-in two reveal">
           <div class="band-copy">
             <div class="kicker">{kicker('How it works')}</div>
@@ -99,7 +105,7 @@ const kicker = (name: string) => `${String(++numbered).padStart(2, '0')} · ${na
           </div>
         </div>
       </section>
-      <section class="band alt">
+      <section class={band('The report')}>
         <div class="band-in reveal">
           <div class="band-head">
             <div class="kicker">{kicker('The report')}</div>
@@ -123,8 +129,10 @@ const kicker = (name: string) => `${String(++numbered).padStart(2, '0')} · ${na
     )
   }
 
+  {campaign && <ShowcaseBand campaign={campaign} class={band('On real APIs')} kicker={kicker('On real APIs')} />}
+
   {prompt && (
-  <section class="band">
+  <section class={band('For coding agents')}>
     <div class="band-in two reveal">
       <div class="band-copy">
         <div class="kicker">{kicker('For coding agents')}</div>
@@ -153,7 +161,7 @@ const kicker = (name: string) => `${String(++numbered).padStart(2, '0')} · ${na
   </section>
   )}
 
-  <section class="band alt">
+  <section class={band('Shaping a run')}>
     <div class="band-in reveal">
       <div class="band-head">
         <div class="kicker">{kicker('Shaping a run')}</div>

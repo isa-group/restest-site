@@ -8,3 +8,6 @@ src/content/docs/docs/
 src/generated/
 public/source/
 public/llms.txt
+
+# Written by scripts/sync-showcase.mjs from the dataset's campaigns, never committed.
+public/showcase/

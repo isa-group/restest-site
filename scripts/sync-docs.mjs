@@ -12,11 +12,12 @@
 // pictures it copies into src/generated/clinic-run/.
 
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { base, repository } from '../site.config.mjs';
+import { write } from './lib/files.mjs';
 import { createResolver } from './lib/links.mjs';
 import { llmsTxt } from './lib/llms.mjs';
 import { AGENTS_PAGE, askingSentence, landingRun, PICTURES, RUN } from './lib/landing-run.mjs';
@@ -113,11 +114,6 @@ function clone(ref) {
 
 function git(dir, ...args) {
   return execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' });
-}
-
-function write(file, text) {
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, text);
 }
 
 function fail(message) {

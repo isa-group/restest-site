@@ -78,8 +78,9 @@ const capital = (text) => (text ? text[0].toUpperCase() + text.slice(1) : text);
 /** On one line, with no character that draws nothing; RESTest has already shortened any value it quotes. */
 const clean = (text) => String(text ?? '').replace(/[\p{Cc}\p{Cf}\s]+/gu, ' ').trim();
 
-/** How many minutes the run was given, from its budget as report.json writes it (PT1M), or null. */
-function minutes(budget) {
-  const match = /^PT(?:(\d+)H)?(?:(\d+)M)?$/.exec(budget ?? '');
-  return match && (match[1] || match[2]) ? Number(match[1] ?? 0) * 60 + Number(match[2] ?? 0) : null;
+/** How many minutes a run was given, from its budget as report.json writes it (PT1M, PT1H30M, PT30S), or null. */
+export function minutes(budget) {
+  const match = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(budget ?? '');
+  if (!match || !(match[1] || match[2] || match[3])) return null;
+  return Number(match[1] ?? 0) * 60 + Number(match[2] ?? 0) + Number(match[3] ?? 0) / 60;
 }

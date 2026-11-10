@@ -31,6 +31,12 @@ export interface Landing {
   run: LandingRun | null;
 }
 
-/** The run's length in words: "a minute", "5 minutes". */
-export const minutesInWords = (minutes: number | null) =>
-  minutes === 1 ? 'a minute' : minutes ? `${minutes} minutes` : 'its budget';
+/** A run's length in words: "30 seconds", "a minute", "5 minutes", "an hour", "2 hours", "90 minutes". */
+export function minutesInWords(minutes: number | null): string {
+  if (!minutes) return 'its budget';
+  if (minutes < 1) return `${Math.round(minutes * 60)} seconds`;
+  if (minutes === 1) return 'a minute';
+  if (minutes === 60) return 'an hour';
+  if (minutes % 60 === 0) return `${minutes / 60} hours`;
+  return `${minutes} minutes`;
+}

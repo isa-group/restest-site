@@ -82,7 +82,7 @@ code {
 }
 
 /* What only works with the page's script is not drawn without it. */
-:root:not(.js) :is(.copy, .live, rt-theme-select) {
+:root:not(.js) :is(.copy, .live, rt-theme-select, .filter) {
   display: none;
 }
 
@@ -776,11 +776,13 @@ code {
   color: var(--rt-text);
 }
 
-.counts b.err {
+:is(.counts, .real-stats, .sc-stats) b.err,
+:is(.mini, .sc-table) td.err {
   color: var(--rt-error);
 }
 
-.counts b.warn {
+:is(.counts, .real-stats, .sc-stats) b.warn,
+:is(.mini, .sc-table) td.warn {
   color: var(--rt-warning);
 }
 
@@ -792,6 +794,94 @@ code {
   .counts div + div {
     border-top: 1px solid var(--rt-line);
     border-left: 0;
+  }
+}
+
+/* The band "On real APIs": the showcase's newest campaign in four figures, and the APIs with the most errors. */
+.real-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--rt-line);
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius-card);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.real-stats div {
+  background: var(--rt-surface);
+  padding: 18px 20px;
+  font-size: var(--rt-text-min);
+  color: var(--rt-text-3);
+}
+
+.real-stats b {
+  display: block;
+  font: 600 30px/1.15 var(--rt-font-num);
+  letter-spacing: -0.02em;
+  color: var(--rt-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.mini {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+  background: var(--rt-surface);
+  border: 1px solid var(--rt-line);
+  border-radius: var(--rt-radius-card);
+  overflow: hidden;
+}
+
+.mini thead th {
+  padding: 10px 16px;
+}
+
+.mini tbody :is(td, th) {
+  padding: 10px 16px;
+  border-top: 1px solid var(--rt-line-faint);
+}
+
+/* What the band's table and the showcase's share: headers, API names, figures, and no line above the first row. */
+:is(.mini, .sc-table) thead th {
+  text-align: left;
+  font-size: var(--rt-text-min);
+  font-weight: 600;
+  color: var(--rt-text-2);
+  border-bottom: 1px solid var(--rt-line);
+  white-space: nowrap;
+}
+
+:is(.mini, .sc-table) thead th.num {
+  text-align: right;
+}
+
+:is(.mini, .sc-table) tbody tr:first-child :is(td, th) {
+  border-top: 0;
+}
+
+:is(.mini, .sc-table) .api {
+  font: 400 var(--rt-text-min) var(--rt-font-mono);
+  color: var(--rt-text);
+  text-align: left;
+}
+
+:is(.mini, .sc-table) td.num {
+  text-align: right;
+  font-family: var(--rt-font-num);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+@media (max-width: 760px) {
+  .real-stats b {
+    font-size: 22px;
+  }
+
+  .mini :is(th, td):nth-child(2) {
+    display: none;
   }
 }
 
@@ -1025,6 +1115,8 @@ code {
 }
 
 .band.contact p a,
+.band-copy p a,
+.sc-lead a,
 .rp-cap a {
   color: var(--rt-accent-text);
   text-decoration: underline;

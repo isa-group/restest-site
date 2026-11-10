@@ -1,0 +1,61 @@
+---
+/*
+ * The first page's band "On real APIs": what the showcase's newest campaign found, in four figures and the five
+ * APIs with the most errors, with a link to the showcase. The first page numbers it and picks its background
+ * with its other bands.
+ */
+import { arrowIcon } from '../landing/icons';
+import { number } from '../landing/format';
+import { minutesInWords } from '../landing/run';
+import { showcaseHome, type Campaign } from './data';
+
+interface Props {
+  campaign: Campaign;
+  class: string;
+  kicker: string;
+}
+const { campaign, class: kind, kicker } = Astro.props;
+const totals = campaign.totals;
+---
+
+<section class={kind}>
+  <div class="band-in two reveal">
+    <div class="band-copy">
+      <div class="kicker">{kicker}</div>
+      <h2>{totals.apis} APIs, <span class="second">{minutesInWords(campaign.minutes)} each.</span></h2>
+      <p>
+        The APIs of the <a href="https://github.com/WebFuzzing/Dataset">Web Fuzzing Dataset</a>, each started on its own
+        and tested by RESTest {campaign.version}. Every row of the showcase opens that run's report.
+      </p>
+      <a class="btn ghost" href={showcaseHome}>See the showcase <Fragment set:html={arrowIcon} /></a>
+    </div>
+    <div>
+      <div class="real-stats">
+        <div><b>{number(totals.requests)}</b>requests</div>
+        <div><b class="err">{number(totals.errors)}</b>errors</div>
+        <div><b class="warn">{number(totals.warnings)}</b>warnings</div>
+        <div><b>{totals.apisWithErrors} of {totals.apis}</b>APIs with an error</div>
+      </div>
+      <table class="mini">
+        <thead>
+          <tr>
+            <th scope="col">Most errors</th>
+            <th scope="col" class="num">Requests</th>
+            <th scope="col" class="num">Errors</th>
+            <th scope="col" class="num">Warnings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {campaign.mostErrors.map((api) => (
+            <tr>
+              <th scope="row" class="api">{api.id}</th>
+              <td class="num">{number(api.requests ?? 0)}</td>
+              <td class="num err">{number(api.errors ?? 0)}</td>
+              <td class="num warn">{number(api.warnings ?? 0)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,182 @@
+---
+/*
+ * The showcase: what a released RESTest found on the APIs of the Web Fuzzing Dataset, one campaign for each
+ * version, as isa-group/restest-dataset publishes them (scripts/sync-showcase.mjs reads them). Each is at
+ * /showcase/<version>/, and the newest at /showcase/ too; with no campaign published there is no showcase.
+ *
+ * A row is an API: its figures from its report.json, its operations by what was found, and its report.html,
+ * which the site serves for the newest campaign and an older campaign's release holds. An API RESTest could not
+ * test says what became of it instead. Without JavaScript every row shows, and the filter is not drawn.
+ */
+import Landing from '../../layouts/Landing.astro';
+import { arrowIcon } from '../../components/landing/icons';
+import { number } from '../../components/landing/format';
+import { siteLinks } from '../../components/landing/links';
+import { minutesInWords, type Landing as LandingData } from '../../components/landing/run';
+import { campaigns, day, outcomes, showcasePath, type Campaign } from '../../components/showcase/data';
+import landing from '../../generated/landing.json';
+import '../../styles/showcase.css';
+
+// Every campaign at /showcase/<version>/, an address that stays its own, and the newest at /showcase/ too.
+export function getStaticPaths() {
+  return [
+    ...(campaigns.length ? [{ params: { campaign: undefined }, props: { campaign: campaigns[0] } }] : []),
+    ...campaigns.map((campaign) => ({ params: { campaign: campaign.version }, props: { campaign } })),
+  ];
+}
+
+const { campaign } = Astro.props as { campaign: Campaign };
+const { version } = landing as LandingData;
+const base = import.meta.env.BASE_URL;
+const links = await siteLinks();
+const totals = campaign.totals;
+const each = minutesInWords(campaign.minutes);
+const newest = campaign === campaigns[0];
+const runner = campaign.runner;
+/** How the picker names a campaign. */
+const label = (c: Campaign) => `RESTest ${c.version} · ${day(c.date)}`;
+---
+
+<Landing
+  title={`RESTest on ${totals.apis} real APIs — RESTest ${campaign.version}`}
+  description={`What RESTest ${campaign.version} found on ${totals.apis} REST APIs of the Web Fuzzing Dataset, each tested for ${each}: every API's figures, and its report.`}
+  version={version}
+  links={links}
+  themeKey="restest-showcase-theme"
+>
+  <div class="sc">
+    <div class="sc-head">
+      <div class="kicker">Showcase</div>
+      <h1>RESTest on {totals.apis} real APIs</h1>
+      <p class="sc-lead">
+        REST APIs from the <a href="https://github.com/WebFuzzing/Dataset">Web Fuzzing Dataset</a>, each started on its
+        own and tested by RESTest. {newest ? 'Open' : 'Download'} a row's report to see each kind of fault, with requests
+        that show it.
+      </p>
+    </div>
+
+    <div class="sc-tools">
+      {
+        campaigns.length > 1 ? (
+          <details class="select">
+            <summary>
+              <span class="sel-l">Campaign</span>
+              <span class="sel-v">{label(campaign)}</span>
+            </summary>
+            <ul>
+              {campaigns.map((other) => (
+                <li>
+                  <a href={`${base}${showcasePath(other)}`} aria-current={other === campaign ? 'page' : undefined}>
+                    {label(other)}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : (
+          <div class="select">
+            <span class="sel-l">Campaign</span>
+            <span class="sel-v">{label(campaign)}</span>
+          </div>
+        )
+      }
+      <label class="filter">
+        <span class="sr">Filter the APIs by name</span>
+        <input type="search" placeholder="Filter APIs" autocomplete="off" data-filter />
+      </label>
+      <div class="legend" aria-hidden="true">
+        <span><i class="b-e"></i>with errors</span><span><i class="b-w"></i>only warnings</span>
+        <span><i class="b-k"></i>nothing found</span><span><i class="b-x"></i>not tested</span>
+      </div>
+    </div>
+
+    <div class="sc-stats">
+      <div><b>{number(totals.apis)}</b><span>APIs</span></div>
+      <div><b>{number(totals.requests)}</b><span>requests</span></div>
+      <div><b class="err">{number(totals.errors)}</b><span>errors</span></div>
+      <div><b class="warn">{number(totals.warnings)}</b><span>warnings</span></div>
+      <div><b>{totals.apisWithErrors} of {totals.apis}</b><span>APIs with an error</span></div>
+    </div>
+
+    <div class="sc-table">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">API</th>
+            <th scope="col" class="num hide-s">Operations</th>
+            <th scope="col" class="num hide-s">Requests</th>
+            <th scope="col" class="num">Errors</th>
+            <th scope="col" class="num hide-s">Warnings</th>
+            <th scope="col"><span class="hide-s">Operations by what was found</span><span class="show-s">Operations</span></th>
+            <th scope="col" class="rep"><span class="sr">Report</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {campaign.apis.map((api) => {
+            const told = `${api.withErrors} with errors, ${api.onlyWarnings} with only warnings, ${api.nothing} with nothing found, ${api.notTested} not tested`;
+            return (
+              <tr data-api={`${api.id} ${api.title}`.toLowerCase()}>
+                <th scope="row" class="api" title={api.title}>{api.id}</th>
+                {api.outcome === 'ran' ? (
+                  <>
+                    <td class="num hide-s">{number(api.operations ?? 0)}</td>
+                    <td class="num hide-s">{number(api.requests ?? 0)}</td>
+                    <td class:list={['num', api.errors ? 'err' : 'zero']}>{number(api.errors ?? 0)}</td>
+                    <td class:list={['num hide-s', api.warnings ? 'warn' : 'zero']}>{number(api.warnings ?? 0)}</td>
+                    <td class="opsbar" title={told}>
+                      <div class="bar" aria-hidden="true">
+                        <span class="b-e" style={`flex-grow:${api.withErrors}`} />
+                        <span class="b-w" style={`flex-grow:${api.onlyWarnings}`} />
+                        <span class="b-k" style={`flex-grow:${api.nothing}`} />
+                        <span class="b-x" style={`flex-grow:${api.notTested}`} />
+                      </div>
+                      <span class="bar-n" aria-hidden="true">{api.withErrors}/{api.operations}</span>
+                      <span class="sr">{told}, of {api.operations} operations</span>
+                    </td>
+                  </>
+                ) : (
+                  <td class="outcome" colspan="5">
+                    {outcomes[api.outcome] ?? api.outcome}
+                    {api.reason && <span class="why">: {api.reason}</span>}
+                  </td>
+                )}
+                <td class="rep">
+                  {api.page && (
+                    <a class="arrow-link" href={newest ? `${base}${api.page}` : api.page}>
+                      {newest ? 'report' : 'download'} <Fragment set:html={arrowIcon} />
+                      <span class="sr"> of {api.id}</span>
+                    </a>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <p class="sc-none" hidden data-none>No API's name holds that.</p>
+    </div>
+
+    <p class="sc-foot">
+      {`RESTest ${campaign.version}, ${each} per API`}
+      {runner && `, on GitHub's ${runner.label} runners (${runner.cpus} CPUs${runner.memoryGiB ? `, ${runner.memoryGiB} GiB` : ''})`}
+      {`, started on ${day(campaign.date)}.`}
+    </p>
+  </div>
+</Landing>
+
+<script>
+  // Rows whose API's name or title holds what is typed; the rest are hidden.
+  const filter = document.querySelector<HTMLInputElement>('[data-filter]');
+  const rows = [...document.querySelectorAll<HTMLTableRowElement>('tr[data-api]')];
+  const none = document.querySelector<HTMLElement>('[data-none]');
+  filter?.addEventListener('input', () => {
+    const wanted = filter.value.trim().toLowerCase();
+    let shown = 0;
+    for (const row of rows) {
+      const show = !wanted || (row.dataset.api ?? '').includes(wanted);
+      row.hidden = !show;
+      if (show) shown++;
+    }
+    if (none) none.hidden = shown > 0;
+  });
+</script>
