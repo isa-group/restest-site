@@ -9,7 +9,7 @@ APIs. It will hold three parts, each added in a pull request of its own:
 
 All three are built; the showcase appears once a campaign is published. The site is built with
 [Astro](https://astro.build) and the documentation with [Starlight](https://starlight.astro.build),
-and both are published on GitHub Pages.
+and both are published on GitHub Pages, at https://restest.org.
 
 ## Building it
 
@@ -19,7 +19,7 @@ With Node 26 (`.nvmrc`):
 npm ci
 npm test            # the steps that copy RESTest's documentation and read the showcase, tested on their own
 npm run build       # the site, in dist/
-npm run preview     # dist/ served at http://localhost:4321/restest-site/
+npm run preview     # dist/ served at http://localhost:4321/
 npm run dev         # or the site served as it is edited
 ```
 
