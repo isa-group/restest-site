@@ -17,6 +17,7 @@ const ways = [
   prompt && {
     id: 'agent',
     name: 'Coding agent',
+    tag: 'Experimental',
     command: prompt,
     note: 'Paste it into your favourite coding agent: the agent installs RESTest and runs it for you.',
   },
@@ -43,12 +44,12 @@ const ways = [
 
 <div class="install" data-tabs>
   <div class="tabs" role="tablist" aria-label="Ways to start">
-    {ways.map((way, i) => <button {...tab('start', way.id, i === 0)}>{way.name}</button>)}
+    {ways.map((way, i) => <button {...tab('start', way.id, i === 0)}>{way.name}{way.tag && <span class="tag"> ({way.tag})</span>}</button>)}
   </div>
   {
     ways.map((way, i) => (
       <div {...panel('start', way.id, i === 0)}>
-        <p class="inst-name">{way.name}</p>
+        <p class="inst-name">{way.name}{way.tag && <span class="tag"> ({way.tag})</span>}</p>
         <div class="cmd">
           <code>{way.command}</code>
           <button type="button" class="copy" data-copy={way.command}>

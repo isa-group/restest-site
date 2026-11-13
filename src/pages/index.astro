@@ -66,6 +66,7 @@ const band = (name: string) => (place(name) % 2 ? 'band alt' : 'band');
   links={links}
 >
   <section class="hero">
+    <p class="badge">Research prototype</p>
     <h1>Automated Testing<br />of REST APIs</h1>
     <p class="lead">For humans, for agents</p>
     <Install version={version} prompt={prompt} />
@@ -79,11 +80,11 @@ const band = (name: string) => (place(name) % 2 ? 'band alt' : 'band');
           <div class="band-copy">
             <div class="kicker">{kicker('How it works')}</div>
             <h2>
-              From an API schema to the faults, <span class="second">with nothing to configure.</span>
+              From an API schema to the failures, <span class="second">with nothing to configure.</span>
             </h2>
             <p>
               Give RESTest an OpenAPI document and the address of the API it describes. It makes up requests, checks
-              every reply against what the document promised, and reports each fault with a <code>curl</code> command
+              every reply against what the document promised, and reports each failure with a <code>curl</code> command
               that sends the request again.
             </p>
             <ol class="steps">
@@ -96,7 +97,7 @@ const band = (name: string) => (place(name) % 2 ? 'band alt' : 'band');
               </li>
               <li>
                 <b>It checks every reply</b> against what the document promised, and says what to fix for each kind of
-                fault.
+                failure.
               </li>
             </ol>
           </div>
@@ -144,7 +145,7 @@ const band = (name: string) => (place(name) % 2 ? 'band alt' : 'band');
         <a class="btn ghost" href={links.agents}>RESTest and coding agents <Fragment set:html={arrowIcon} /></a>
       </div>
       <div class="flow">
-        <div class="you"><span class="who">You</span><code>{prompt}</code></div>
+        <div class="you"><span class="who">You <span class="badge">Experimental feature</span></span><code>{prompt}</code></div>
         <ol>
           <li><b>It installs or updates RESTest</b>, with Homebrew, jbang, the image or the archive, whichever fits.</li>
           <li><b>It makes a quick first pass</b>, a run of one minute, and tells you in a few lines what it found.</li>
@@ -194,8 +195,8 @@ const band = (name: string) => (place(name) % 2 ? 'band alt' : 'band');
         <div class="kicker">{kicker('About us')}</div>
         <h2>Do you need help? <span class="second">Contact us.</span></h2>
         <p>
-          RESTest is developed by the SCORE Research Lab at the University of Seville (Spain). If you would like to try it
-          on your organisation's APIs and need help, let us know, we will be glad to help.
+          RESTest is a research prototype developed by the SCORE Research Lab at the University of Seville (Spain). If
+          you would like to try it on your organisation's APIs and need help, let us know, we will be glad to help.
         </p>
         <div class="links">
           <a class="btn" href="mailto:sergiosegura@us.es">Write to us <Fragment set:html={arrowIcon} /></a>

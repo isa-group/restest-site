@@ -182,6 +182,29 @@ code {
   color: var(--rt-accent-text);
 }
 
+/* A small mark that says what kind of thing something is: a research prototype, an experimental feature. */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--rt-accent) 45%, transparent);
+  border-radius: 999px;
+  background: var(--rt-accent-soft);
+  color: var(--rt-accent-strong);
+  font: 500 var(--rt-text-min)/1.2 var(--rt-font-mono);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.hero .badge {
+  margin: 0 0 24px;
+}
+
+/* What a way to start is, beside its name: in the accent, so that it is seen before the command is copied. */
+.install .tag {
+  font-weight: 500;
+  color: var(--rt-accent-text);
+}
+
 .install {
   max-width: 660px;
   margin: 0 auto;
@@ -1008,7 +1031,15 @@ code {
 }
 
 .flow .you .who {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   font: 600 var(--rt-text-min) var(--rt-font-sans);
+}
+
+.flow .you .who .badge {
+  font-weight: 500;
 }
 
 .flow .you code {
@@ -1215,6 +1246,11 @@ code {
 
   .tabs button {
     padding: 8px 9px;
+  }
+
+  /* On a phone the four tabs fit only with what a way is under its name. */
+  .tabs .tag {
+    display: block;
   }
 
   .band {

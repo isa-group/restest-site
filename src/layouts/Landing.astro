@@ -98,12 +98,14 @@ const canonical = new URL(Astro.url.pathname, site).href;
           <a href={links.manual}>The manual</a>
           <a href={links.reference}>Reference</a>
           {links.agents && <a href={links.agents}>For coding agents</a>}
+          <a href={`${repository}#use-of-generative-ai`}>Use of Generative AI</a>
         </div>
         <div>
           <b>Project</b>
           <a href={repository}>GitHub</a>
           <a href={`${repository}/releases`}>Releases</a>
           {links.showcase && <a href={links.showcase}>Showcase</a>}
+          <a href={`${repository}#disclaimer`}>Disclaimer</a>
         </div>
       </div>
     </footer>
